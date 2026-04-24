@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión — Rasa Nusantara</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&family=Dancing+Script:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23C1272D'/%3E%3Ctext x='50' y='68' text-anchor='middle' font-size='58'%3E🍜%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+    <!-- ========== HEADER ========== -->
+    <header class="header" id="header">
+        <nav class="navbar">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">🍜</div>
+                <div class="logo-text">
+                    <span class="brand">RASA NUSANTARA</span>
+                    <span class="tagline">Sabor del Archipiélago</span>
+                </div>
+            </a>
+
+            <ul class="nav-menu" id="nav-menu">
+                <li><a href="index.html"><i class="fa-solid fa-house"></i> Inicio</a></li>
+                <li><a href="menu.html"><i class="fa-solid fa-utensils"></i> Menú</a></li>
+                <li><a href="reservaciones.html"><i class="fa-solid fa-calendar-check"></i> Reservar</a></li>
+                <li id="mis-reservas-link" class="hidden"><a href="mis-reservaciones.html"><i class="fa-solid fa-bookmark"></i> Mis Reservas</a></li>
+                <li id="admin-link" class="hidden"><a href="admin.html"><i class="fa-solid fa-user-shield"></i> Admin</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <div id="user-info" class="user-info hidden">
+                    <i class="fa-solid fa-user"></i>
+                    <span class="user-name"></span>
+                </div>
+                <a href="login.html" id="login-btn" class="btn btn-secondary btn-sm hidden">
+                    <i class="fa-solid fa-right-to-bracket"></i>
+                    <span>Entrar</span>
+                </a>
+                <button id="logout-btn" class="btn btn-outline btn-sm hidden" style="color: var(--color-secondary); border-color: var(--color-secondary);">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Salir</span>
+                </button>
+                <button class="hamburger" id="hamburger" aria-label="Abrir menú">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- ========== BANNER (pequeño para auth) ========== -->
+    <section class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="logo-icon">🍜</div>
+                <h2 id="auth-title">Iniciar Sesión</h2>
+                <p id="auth-subtitle">Selamat Datang</p>
+            </div>
+
+            <div class="auth-body">
+                <!-- Toggle Login / Registro -->
+                <div class="auth-toggle">
+                    <button id="toggle-login" class="active" type="button">
+                        <i class="fa-solid fa-right-to-bracket"></i> Entrar
+                    </button>
+                    <button id="toggle-register" type="button">
+                        <i class="fa-solid fa-user-plus"></i> Registrarse
+                    </button>
+                </div>
+
+                <!-- Alerta -->
+                <div class="form-alert" id="auth-alert"></div>
+
+                <!-- Formulario de LOGIN -->
+                <form id="login-form">
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-envelope"></i> Correo electrónico</label>
+                        <input type="email" class="form-control" id="login-email" required placeholder="tu@email.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-lock"></i> Contraseña</label>
+                        <input type="password" class="form-control" id="login-password" required placeholder="••••••••">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100" id="btn-login-submit">
+                        <i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión
+                    </button>
+                </form>
+
+                <!-- Formulario de REGISTRO -->
+                <form id="register-form" class="hidden">
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-user"></i> Nombre completo</label>
+                        <input type="text" class="form-control" id="register-name" required placeholder="Tu nombre">
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-envelope"></i> Correo electrónico</label>
+                        <input type="email" class="form-control" id="register-email" required placeholder="tu@email.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-phone"></i> Teléfono (opcional)</label>
+                        <input type="tel" class="form-control" id="register-phone" placeholder="+52 55 1234-5678">
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-lock"></i> Contraseña</label>
+                        <input type="password" class="form-control" id="register-password" required minlength="6" placeholder="Mínimo 6 caracteres">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100" id="btn-register-submit">
+                        <i class="fa-solid fa-user-plus"></i> Crear cuenta
+                    </button>
+                </form>
+
+                <!-- Usuarios de ejemplo (demo) -->
+                <div class="demo-users">
+                    <h5><i class="fa-solid fa-circle-info"></i> Usuarios de prueba (click para autocompletar)</h5>
+                    <div class="demo-row" data-email="admin@rasanusantara.com" data-pass="admin123">
+                        <span class="demo-role"><i class="fa-solid fa-user-shield"></i> Admin</span>
+                        <span>admin@rasanusantara.com / admin123</span>
+                    </div>
+                    <div class="demo-row" data-email="usuario@rasanusantara.com" data-pass="user123">
+                        <span class="demo-role"><i class="fa-solid fa-user"></i> Usuario</span>
+                        <span>usuario@rasanusantara.com / user123</span>
+                    </div>
+                    <div class="demo-row" data-email="maria@rasanusantara.com" data-pass="maria123">
+                        <span class="demo-role"><i class="fa-solid fa-user"></i> Usuario</span>
+                        <span>maria@rasanusantara.com / maria123</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== LAYOUT CON SECTION + ASIDE (cumple requisito) ========== -->
+    <div class="main-layout" style="padding-top: 20px; padding-bottom: 40px;">
+        <main class="main-section">
+            <section class="section" style="padding: 30px 0;">
+                <div class="section-header">
+                    <span class="section-tag">Únete a nosotros</span>
+                    <h2 class="section-title">Beneficios de ser miembro</h2>
+                </div>
+                <div class="features">
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fa-solid fa-calendar-check"></i></div>
+                        <h3>Reservas rápidas</h3>
+                        <p>Guarda tus preferencias y agiliza cada reserva.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fa-solid fa-gift"></i></div>
+                        <h3>Promociones exclusivas</h3>
+                        <p>Descuentos y menús especiales sólo para miembros.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fa-solid fa-history"></i></div>
+                        <h3>Historial de visitas</h3>
+                        <p>Consulta tus reservas pasadas y favoritas.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <aside class="main-aside">
+            <div class="aside-widget">
+                <h4><i class="fa-solid fa-circle-question"></i> ¿Ayuda?</h4>
+                <p style="font-size: 0.9rem; color: var(--color-text-light);">
+                    ¿Problemas para acceder? Contáctanos y te ayudamos a recuperar tu cuenta.
+                </p>
+                <div class="aside-contact mt-2">
+                    <div class="aside-contact-item">
+                        <i class="fa-solid fa-phone"></i>
+                        <span>+52 55 1234-5678</span>
+                    </div>
+                    <div class="aside-contact-item">
+                        <i class="fa-solid fa-envelope"></i>
+                        <span>soporte@rasanusantara.mx</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="aside-widget">
+                <h4><i class="fa-solid fa-shield-halved"></i> Seguridad</h4>
+                <p style="font-size: 0.88rem; color: var(--color-text-light); line-height: 1.7;">
+                    Tus datos están protegidos con cifrado de última generación.
+                    Nunca compartimos tu información con terceros.
+                </p>
+            </div>
+        </aside>
+    </div>
+
+    <!-- ========== FOOTER ========== -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-col">
+                <div class="footer-brand">
+                    <div class="logo-icon">🍜</div>
+                    <span class="footer-brand-text">RASA NUSANTARA</span>
+                </div>
+                <p>Auténtica gastronomía indonesia en CDMX.</p>
+                <div class="footer-social">
+                    <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#"><i class="fa-brands fa-twitter"></i></a>
+                    <a href="#"><i class="fa-brands fa-whatsapp"></i></a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h5>Navegación</h5>
+                <ul>
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="menu.html">Menú</a></li>
+                    <li><a href="reservaciones.html">Reservaciones</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h5>Soporte</h5>
+                <ul>
+                    <li><a href="#">Preguntas frecuentes</a></li>
+                    <li><a href="#">Política de privacidad</a></li>
+                    <li><a href="#">Términos y condiciones</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h5>Contacto</h5>
+                <div class="footer-contact-item"><i class="fa-solid fa-map-marker-alt"></i><span>Av. Reforma 1234, CDMX</span></div>
+                <div class="footer-contact-item"><i class="fa-solid fa-phone"></i><span>+52 55 1234-5678</span></div>
+                <div class="footer-contact-item"><i class="fa-solid fa-envelope"></i><span>hola@rasanusantara.mx</span></div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>© 2026 Rasa Nusantara · Todos los derechos reservados</span>
+            <span>Hecho con <i class="fa-solid fa-heart" style="color: var(--color-primary);"></i> en México</span>
+        </div>
+    </footer>
+
+    <script type="module" src="js/main.js"></script>
+    <script type="module">
+        import { loginUser, registerUser, getCurrentUser } from './js/auth.js';
+        import { showToast } from './js/main.js';
+
+        // Si ya está logueado, redirigir
+        if (getCurrentUser()) {
+            window.location.href = 'index.html';
+        }
+
+        // Toggle entre login y registro
+        const toggleLogin = document.getElementById('toggle-login');
+        const toggleRegister = document.getElementById('toggle-register');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const authTitle = document.getElementById('auth-title');
+        const authSubtitle = document.getElementById('auth-subtitle');
+        const authAlert = document.getElementById('auth-alert');
+
+        toggleLogin.addEventListener('click', () => {
+            toggleLogin.classList.add('active');
+            toggleRegister.classList.remove('active');
+            loginForm.classList.remove('hidden');
+            registerForm.classList.add('hidden');
+            authTitle.textContent = 'Iniciar Sesión';
+            authSubtitle.textContent = 'Selamat Datang';
+            authAlert.classList.remove('show');
+        });
+
+        toggleRegister.addEventListener('click', () => {
+            toggleRegister.classList.add('active');
+            toggleLogin.classList.remove('active');
+            registerForm.classList.remove('hidden');
+            loginForm.classList.add('hidden');
+            authTitle.textContent = 'Crear Cuenta';
+            authSubtitle.textContent = 'Selamat Bergabung';
+            authAlert.classList.remove('show');
+        });
+
+        // Click en usuarios de ejemplo
+        document.querySelectorAll('.demo-row').forEach(row => {
+            row.addEventListener('click', () => {
+                document.getElementById('login-email').value = row.dataset.email;
+                document.getElementById('login-password').value = row.dataset.pass;
+                toggleLogin.click();
+            });
+        });
+
+        // Mostrar alerta
+        function showAlert(message, type = 'error') {
+            authAlert.className = `form-alert ${type} show`;
+            authAlert.textContent = message;
+        }
+
+        // Submit de LOGIN
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+
+            const btn = document.getElementById('btn-login-submit');
+            const btnHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loader"></span> Verificando...';
+
+            const result = await loginUser(email, password);
+
+            if (result.success) {
+                showAlert(`¡Bienvenido, ${result.user.displayName}!`, 'success');
+                showToast(`¡Bienvenido, ${result.user.displayName}!`, 'success');
+                setTimeout(() => {
+                    window.location.href = result.user.role === 'admin' ? 'admin.html' : 'index.html';
+                }, 800);
+            } else {
+                showAlert(result.error, 'error');
+                btn.disabled = false;
+                btn.innerHTML = btnHtml;
+            }
+        });
+
+        // Submit de REGISTRO
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const userData = {
+                displayName: document.getElementById('register-name').value.trim(),
+                email: document.getElementById('register-email').value.trim(),
+                phone: document.getElementById('register-phone').value.trim(),
+                password: document.getElementById('register-password').value
+            };
+
+            const btn = document.getElementById('btn-register-submit');
+            const btnHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loader"></span> Registrando...';
+
+            const result = await registerUser(userData);
+
+            if (result.success) {
+                showAlert(`¡Bienvenido, ${result.user.displayName}! Tu cuenta fue creada.`, 'success');
+                showToast('¡Cuenta creada con éxito!', 'success');
+                setTimeout(() => window.location.href = 'index.html', 1200);
+            } else {
+                showAlert(result.error, 'error');
+                btn.disabled = false;
+                btn.innerHTML = btnHtml;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selección de Platillos — Rasa Nusantara</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&family=Dancing+Script:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23C1272D'/%3E%3Ctext x='50' y='68' text-anchor='middle' font-size='58'%3E🍜%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+    <!-- ========== HEADER ========== -->
+    <header class="header" id="header">
+        <nav class="navbar">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">🍜</div>
+                <div class="logo-text">
+                    <span class="brand">RASA NUSANTARA</span>
+                    <span class="tagline">Sabor del Archipiélago</span>
+                </div>
+            </a>
+            <ul class="nav-menu" id="nav-menu">
+                <li><a href="index.html"><i class="fa-solid fa-house"></i> Inicio</a></li>
+                <li><a href="menu.html"><i class="fa-solid fa-utensils"></i> Menú</a></li>
+                <li><a href="reservaciones.html"><i class="fa-solid fa-calendar-check"></i> Reservar</a></li>
+                <li id="mis-reservas-link" class="hidden"><a href="mis-reservaciones.html"><i class="fa-solid fa-bookmark"></i> Mis Reservas</a></li>
+                <li id="admin-link" class="hidden"><a href="admin.html"><i class="fa-solid fa-user-shield"></i> Admin</a></li>
+            </ul>
+            <div class="nav-actions">
+                <div id="user-info" class="user-info hidden">
+                    <i class="fa-solid fa-user"></i><span class="user-name"></span>
+                </div>
+                <a href="login.html" id="login-btn" class="btn btn-secondary btn-sm">
+                    <i class="fa-solid fa-right-to-bracket"></i><span>Entrar</span>
+                </a>
+                <button id="logout-btn" class="btn btn-outline btn-sm hidden" style="color: var(--color-secondary); border-color: var(--color-secondary);">
+                    <i class="fa-solid fa-right-from-bracket"></i><span>Salir</span>
+                </button>
+                <button class="hamburger" id="hamburger" aria-label="Abrir menú">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- ========== BANNER ========== -->
+    <section class="banner banner-small">
+        <div class="banner-content">
+            <span class="banner-welcome">Carta Nusantara</span>
+            <h1 class="banner-title">Selección de <span>Platillos</span></h1>
+            <p class="banner-breadcrumb">
+                <a href="index.html"><i class="fa-solid fa-house"></i> Inicio</a>
+                <i class="fa-solid fa-chevron-right"></i>
+                Menú
+            </p>
+        </div>
+    </section>
+
+    <!-- ========== LAYOUT SECTION + ASIDE ========== -->
+    <div class="main-layout">
+        <main class="main-section">
+
+            <section class="section" id="seleccion-platillos" style="padding-top: 20px;">
+                <!-- Se renderiza completamente desde menu.js -->
+                <div class="card" style="padding: 40px; text-align: center;">
+                    <i class="fa-solid fa-spinner fa-spin" style="font-size: 2.5rem; color: var(--color-secondary); margin-bottom: 15px;"></i>
+                    <h3>Cargando tu carta…</h3>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- ========== ASIDE ========== -->
+        <aside class="main-aside">
+
+            <div class="aside-widget" style="background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%); color: white;">
+                <h4 style="color: white; border-bottom-color: rgba(255,255,255,0.3);">
+                    <i class="fa-solid fa-calendar-plus" style="color: var(--color-secondary);"></i>
+                    ¿Sin reservación aún?
+                </h4>
+                <p style="font-size: 0.9rem; opacity: 0.95; margin-bottom: 15px;">
+                    Primero reserva una mesa y elige tu menú de tiempos. Una vez confirmada, podrás elegir tus platillos aquí.
+                </p>
+                <a href="reservaciones.html" class="btn btn-secondary w-100 btn-sm">
+                    <i class="fa-solid fa-calendar-check"></i> Reservar ahora
+                </a>
+            </div>
+
+            <div class="aside-widget">
+                <h4><i class="fa-solid fa-tags"></i> Sobre las etiquetas</h4>
+                <div class="tag-list" style="margin-bottom: 10px;">
+                    <span class="tag">Vegano</span>
+                    <span class="tag">Sin gluten</span>
+                    <span class="tag">Chef's pick</span>
+                    <span class="tag">Tradicional</span>
+                </div>
+                <p style="font-size: 0.85rem; color: var(--color-text-light);">
+                    Cada platillo tiene etiquetas para ayudarte a elegir según tus preferencias.
+                </p>
+            </div>
+
+            <div class="aside-widget">
+                <h4><i class="fa-solid fa-fire"></i> Niveles de picante</h4>
+                <ul style="font-size: 0.9rem; line-height: 1.9;">
+                    <li><span class="spicy-level spicy-level--1"><span class="spicy-level-peppers">🌶️</span><span class="spicy-level-text">Suave</span></span></li>
+                    <li><span class="spicy-level spicy-level--2"><span class="spicy-level-peppers">🌶️🌶️</span><span class="spicy-level-text">Medio</span></span></li>
+                    <li><span class="spicy-level spicy-level--3"><span class="spicy-level-peppers">🌶️🌶️🌶️</span><span class="spicy-level-text">Picante</span></span></li>
+                    <li><span class="spicy-level spicy-level--4"><span class="spicy-level-peppers">🌶️🌶️🌶️🌶️</span><span class="spicy-level-text">Muy picante</span></span></li>
+                </ul>
+                <p style="font-size: 0.85rem; color: var(--color-text-light); margin-top: 10px;">
+                    Todos nuestros platillos se pueden ajustar a tu tolerancia. Pregunta a tu mesero.
+                </p>
+            </div>
+
+            <div class="aside-widget">
+                <h4><i class="fa-solid fa-globe"></i> Regiones</h4>
+                <ul>
+                    <li><i class="fa-solid fa-map-pin"></i> <span>Java</span></li>
+                    <li><i class="fa-solid fa-map-pin"></i> <span>Bali</span></li>
+                    <li><i class="fa-solid fa-map-pin"></i> <span>Sumatra</span></li>
+                    <li><i class="fa-solid fa-map-pin"></i> <span>Sulawesi</span></li>
+                    <li><i class="fa-solid fa-map-pin"></i> <span>Yakarta</span></li>
+                </ul>
+                <p style="font-family: var(--font-decorative); color: var(--color-primary); text-align: center; margin-top: 15px; font-size: 1.2rem;">
+                    Terima Kasih
+                </p>
+            </div>
+
+        </aside>
+    </div>
+
+    <!-- ========== FOOTER ========== -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-col">
+                <div class="footer-brand">
+                    <div class="logo-icon">🍜</div>
+                    <span class="footer-brand-text">RASA NUSANTARA</span>
+                </div>
+                <p>Auténtica gastronomía indonesia en CDMX.</p>
+                <div class="footer-social">
+                    <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#"><i class="fa-brands fa-twitter"></i></a>
+                    <a href="#"><i class="fa-brands fa-whatsapp"></i></a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h5>Navegación</h5>
+                <ul>
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="menu.html">Menú</a></li>
+                    <li><a href="reservaciones.html">Reservaciones</a></li>
+                    <li><a href="mis-reservaciones.html">Mis Reservas</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h5>Menús</h5>
+                <ul>
+                    <li><a href="reservaciones.html">Clásico (3 tiempos)</a></li>
+                    <li><a href="reservaciones.html">Formal (4 tiempos)</a></li>
+                    <li><a href="reservaciones.html">Gala (5 tiempos)</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h5>Contacto</h5>
+                <div class="footer-contact-item"><i class="fa-solid fa-map-marker-alt"></i><span>Av. Reforma 1234, CDMX</span></div>
+                <div class="footer-contact-item"><i class="fa-solid fa-phone"></i><span>+52 55 1234-5678</span></div>
+                <div class="footer-contact-item"><i class="fa-solid fa-envelope"></i><span>hola@rasanusantara.mx</span></div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>© 2026 Rasa Nusantara · Todos los derechos reservados</span>
+            <span>Hecho con <i class="fa-solid fa-heart" style="color: var(--color-primary);"></i> en México</span>
+        </div>
+    </footer>
+
+    <script type="module" src="js/main.js"></script>
+    <script type="module" src="js/menu.js"></script>
+</body>
+</html>

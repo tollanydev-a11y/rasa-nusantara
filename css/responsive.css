@@ -1,0 +1,651 @@
+/* ===================================================
+   RASA NUSANTARA - Responsive Design
+   Breakpoints: 1200px (PC), 756px (Tablet), 480px (Móvil)
+   =================================================== */
+
+/* ============================================
+   TABLET Y MENOR - Menú hamburguesa activo
+   Breakpoint 1135px: evita el wrap icono/texto en
+   el rango 995-1135 donde antes se rompía el nav
+   ============================================ */
+@media (max-width: 1135px) {
+    h1 { font-size: 2.5rem; }
+    h2 { font-size: 2rem; }
+    h3 { font-size: 1.5rem; }
+
+    .banner-title { font-size: 3rem; }
+    .banner-small .banner-title { font-size: 2.5rem; }
+
+    /* Navegación responsive */
+    .hamburger {
+        display: block;
+    }
+
+    .nav-menu {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 80%;
+        max-width: 320px;
+        height: 100vh;
+        background: var(--color-dark-deep);
+        flex-direction: column;
+        padding: 90px 25px 25px;
+        transition: right 0.3s ease;
+        box-shadow: var(--shadow-xl);
+        gap: 8px;
+        align-items: stretch;
+        overflow-y: auto;
+        border-left: 3px solid var(--color-secondary);
+    }
+
+    .nav-menu.active {
+        right: 0;
+    }
+
+    .nav-menu li {
+        width: 100%;
+    }
+
+    .nav-menu li a {
+        display: block;
+        padding: 14px 18px;
+        border-radius: var(--radius-sm);
+        border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+    }
+
+    .nav-menu li a:hover {
+        background: rgba(193, 39, 45, 0.25);
+    }
+
+    .nav-actions {
+        gap: 8px;
+    }
+
+    .user-info {
+        font-size: 0.82rem;
+        padding: 5px 10px;
+    }
+
+    .user-info span:not(.user-name) {
+        display: none;
+    }
+
+    /* Overlay al abrir menú */
+    .menu-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+        opacity: 0;
+        visibility: hidden;
+        transition: var(--transition);
+    }
+
+    .menu-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    /* Layout (section + aside) */
+    .main-layout {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+
+    .main-aside {
+        position: static;
+    }
+
+    /* Footer */
+    .footer-content {
+        grid-template-columns: 1fr 1fr;
+        gap: 35px;
+    }
+
+    /* Menú de tiempos */
+    .menu-tiempos {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+}
+
+/* ============================================
+   TABLET (756px y menor)
+   ============================================ */
+@media (max-width: 756px) {
+    html { font-size: 15px; }
+
+    h1 { font-size: 2rem; }
+    h2 { font-size: 1.75rem; }
+
+    .container {
+        padding: 0 15px;
+    }
+
+    .navbar {
+        padding: 12px 15px;
+    }
+
+    .logo-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.3rem;
+    }
+
+    .logo-text .brand {
+        font-size: 1.1rem;
+    }
+
+    .logo-text .tagline {
+        font-size: 0.75rem;
+    }
+
+    /* Banner */
+    .banner {
+        min-height: 70vh;
+        margin-top: 68px;
+    }
+
+    .banner-title {
+        font-size: 2.5rem;
+    }
+
+    .banner-subtitle {
+        font-size: 1rem;
+    }
+
+    .banner-welcome {
+        font-size: 1.4rem;
+    }
+
+    .banner-small {
+        min-height: 35vh;
+    }
+
+    .banner-small .banner-title {
+        font-size: 2rem;
+    }
+
+    .banner-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .banner-buttons .btn {
+        width: 100%;
+        max-width: 280px;
+    }
+
+    /* Secciones */
+    .section {
+        padding: 40px 0;
+    }
+
+    .section-title {
+        font-size: 1.8rem;
+    }
+
+    /* Layout */
+    .main-layout {
+        padding: 40px 15px;
+    }
+
+    /* Formularios */
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .form-container {
+        padding: 30px 20px;
+    }
+
+    /* Footer */
+    .footer-content {
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: 30px;
+    }
+
+    .footer-col h5::after {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .footer-brand {
+        justify-content: center;
+    }
+
+    .footer-social {
+        justify-content: center;
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+
+    /* Tablas */
+    .data-table {
+        font-size: 0.82rem;
+    }
+
+    .data-table th,
+    .data-table td {
+        padding: 10px 8px;
+    }
+
+    .admin-tabs {
+        flex-wrap: wrap;
+    }
+
+    .admin-tab {
+        padding: 8px 14px;
+        font-size: 0.85rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .admin-panel {
+        padding: 20px 15px;
+    }
+
+    /* Mesas - ajustar grid */
+    .mesas-grid {
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    }
+
+    /* Dishes */
+    .dishes-grid {
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+
+    /* Auth */
+    .auth-container {
+        margin-top: 68px;
+        padding: 25px 15px;
+    }
+
+    .auth-body {
+        padding: 25px 20px;
+    }
+
+    .auth-header {
+        padding: 28px 20px;
+    }
+
+    /* Toast */
+    .toast-container {
+        top: 80px;
+        right: 10px;
+        left: 10px;
+    }
+
+    .toast {
+        min-width: auto;
+        max-width: none;
+    }
+
+    /* Ornamento */
+    .ornament::before,
+    .ornament::after {
+        width: 40px;
+    }
+}
+
+/* ============================================
+   MÓVIL (480px y menor)
+   ============================================ */
+@media (max-width: 480px) {
+    html { font-size: 14px; }
+
+    h1 { font-size: 1.75rem; }
+    h2 { font-size: 1.5rem; }
+    h3 { font-size: 1.25rem; }
+
+    .container {
+        padding: 0 12px;
+    }
+
+    .navbar {
+        padding: 10px 12px;
+    }
+
+    .logo-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 1.2rem;
+    }
+
+    .logo-text .brand {
+        font-size: 1rem;
+    }
+
+    .logo-text .tagline {
+        display: none;
+    }
+
+    /* Banner */
+    .banner {
+        min-height: 60vh;
+        margin-top: 62px;
+    }
+
+    .banner-title {
+        font-size: 2rem;
+    }
+
+    .banner-subtitle {
+        font-size: 0.9rem;
+    }
+
+    .banner-welcome {
+        font-size: 1.2rem;
+    }
+
+    .banner-small {
+        min-height: 28vh;
+    }
+
+    .banner-small .banner-title {
+        font-size: 1.75rem;
+    }
+
+    .banner-content {
+        padding: 40px 15px;
+    }
+
+    /* Section */
+    .section {
+        padding: 30px 0;
+    }
+
+    .section-header {
+        margin-bottom: 30px;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+    }
+
+    .section-tag {
+        font-size: 1.2rem;
+    }
+
+    /* Botones */
+    .btn {
+        padding: 10px 20px;
+        font-size: 0.85rem;
+    }
+
+    .btn-lg {
+        padding: 12px 26px;
+        font-size: 0.95rem;
+    }
+
+    /* Layout */
+    .main-layout {
+        padding: 30px 12px;
+        gap: 25px;
+    }
+
+    /* Features */
+    .features {
+        grid-template-columns: 1fr;
+    }
+
+    .feature-card {
+        padding: 25px 18px;
+    }
+
+    /* Dishes */
+    .dishes-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* Menú tiempos */
+    .tiempo-card {
+        padding: 25px 18px;
+    }
+
+    .tiempo-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 1.6rem;
+    }
+
+    .tiempo-card .tiempo-price {
+        font-size: 1.6rem;
+    }
+
+    /* Menú items */
+    .menu-category {
+        padding: 20px 15px;
+    }
+
+    .menu-items {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .menu-item {
+        padding: 12px;
+    }
+
+    /* Área selector */
+    .area-selector {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .area-option {
+        padding: 15px 10px;
+    }
+
+    .area-option i {
+        font-size: 1.6rem;
+    }
+
+    /* Mesas grid */
+    .mesas-grid {
+        grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+        gap: 8px;
+        padding: 15px 10px;
+    }
+
+    .mesa {
+        font-size: 0.75rem;
+    }
+
+    .mesa i {
+        font-size: 1rem;
+    }
+
+    /* Tabla scroll horizontal */
+    .table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .data-table {
+        min-width: 500px;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-card {
+        padding: 20px 18px;
+    }
+
+    .stat-number {
+        font-size: 2rem;
+    }
+
+    /* Form */
+    .form-container {
+        padding: 25px 18px;
+    }
+
+    /* Auth */
+    .auth-header {
+        padding: 24px 18px;
+    }
+
+    .auth-header .logo-icon {
+        width: 60px;
+        height: 60px;
+    }
+
+    .auth-header h2 {
+        font-size: 1.5rem;
+    }
+
+    .auth-body {
+        padding: 22px 18px;
+    }
+
+    /* Footer */
+    .footer {
+        padding: 40px 15px 15px;
+    }
+
+    .footer-col h5 {
+        font-size: 1rem;
+    }
+
+    /* Aside widget */
+    .aside-widget {
+        padding: 18px;
+    }
+
+    /* Mesa legend */
+    .mesa-legend {
+        gap: 12px;
+        font-size: 0.78rem;
+    }
+
+    /* Nav actions */
+    .user-info {
+        display: none;
+    }
+
+    .nav-actions .btn {
+        padding: 6px 12px;
+        font-size: 0.75rem;
+    }
+}
+
+/* ============================================
+   MÓVIL EXTRA PEQUEÑO (360px)
+   ============================================ */
+@media (max-width: 360px) {
+    .banner-title {
+        font-size: 1.7rem;
+    }
+
+    .logo-text {
+        display: none;
+    }
+
+    .mesas-grid {
+        grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+    }
+}
+
+/* ==========================================================
+   RESPONSIVE - Calendario, tables-grid, menu-cards, admin
+   ========================================================== */
+@media (max-width: 756px) {
+    .calendar-panel { padding: 18px; }
+    .cal-day { font-size: 0.8rem; }
+    .cal-legend { font-size: 0.72rem; gap: 10px; }
+
+    .tables-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 10px;
+    }
+    .table-card { padding: 14px; }
+    .table-card__number { font-size: 1.6rem; }
+
+    .menu-admin-card {
+        flex-direction: row;
+        padding: 12px;
+    }
+    .menu-admin-info {
+        min-width: 120px;
+    }
+
+    .menu-grid-full {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-card {
+        padding: 22px 18px;
+    }
+
+    .res-filter-row {
+        gap: 8px;
+    }
+    .res-filter-row input,
+    .res-filter-row select {
+        flex: 1;
+        min-width: 110px;
+    }
+
+    .my-res-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .my-res-right {
+        flex-direction: row;
+        align-self: stretch;
+        justify-content: space-between;
+        align-items: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .cal-day { font-size: 0.75rem; border-width: 1.5px; }
+    .cal-day-header { font-size: 0.6rem; }
+    .cal-grid { gap: 2px; }
+    .cal-legend { font-size: 0.68rem; gap: 8px; }
+
+    .calendar-panel { padding: 14px; }
+    .cal-header h3 { font-size: 1.05rem; }
+
+    .tables-grid {
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        gap: 8px;
+    }
+
+    .menu-tab-btn {
+        font-size: 0.78rem;
+        padding: 8px 14px;
+    }
+
+    .menu-admin-card {
+        gap: 10px;
+    }
+    .menu-admin-icon {
+        font-size: 1.5rem;
+    }
+    .menu-admin-actions {
+        gap: 5px;
+    }
+
+    .modal-card {
+        padding: 18px 14px;
+    }
+    .modal-card h3 {
+        font-size: 1.3rem;
+    }
+
+    .filter-btn {
+        font-size: 0.72rem;
+        padding: 6px 12px;
+    }
+}

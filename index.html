@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rasa Nusantara — Auténtica Cocina Indonesia</title>
+    <meta
+      name="description"
+      content="Rasa Nusantara: restaurante de auténtica gastronomía indonesia. Nasi Goreng, Rendang, Sate y más. Reserva tu mesa hoy."
+    />
+
+    <!-- Google Fonts: Playfair Display + Poppins + Dancing Script -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&family=Dancing+Script:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
+
+    <!-- Estilos -->
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23C1272D'/%3E%3Ctext x='50' y='68' text-anchor='middle' font-size='58'%3E🍜%3C/text%3E%3C/svg%3E"
+    />
+  </head>
+  <body>
+    <!-- ========== HEADER / NAV ========== -->
+    <header class="header" id="header">
+      <nav class="navbar">
+        <a href="index.html" class="logo">
+          <div class="logo-icon">🍜</div>
+          <div class="logo-text">
+            <span class="brand">RASA NUSANTARA</span>
+            <span class="tagline">Sabor del Archipiélago</span>
+          </div>
+        </a>
+
+        <ul class="nav-menu" id="nav-menu">
+          <li>
+            <a href="index.html"><i class="fa-solid fa-house"></i> Inicio</a>
+          </li>
+          <li>
+            <a href="menu.html"><i class="fa-solid fa-utensils"></i> Menú</a>
+          </li>
+          <li>
+            <a href="reservaciones.html"
+              ><i class="fa-solid fa-calendar-check"></i> Reservar</a
+            >
+          </li>
+          <li id="mis-reservas-link" class="hidden">
+            <a href="mis-reservaciones.html"
+              ><i class="fa-solid fa-bookmark"></i> Mis Reservas</a
+            >
+          </li>
+          <li id="admin-link" class="hidden">
+            <a href="admin.html"
+              ><i class="fa-solid fa-user-shield"></i> Admin</a
+            >
+          </li>
+        </ul>
+
+        <div class="nav-actions">
+          <div id="user-info" class="user-info hidden">
+            <i class="fa-solid fa-user"></i>
+            <span class="user-name"></span>
+          </div>
+          <a href="login.html" id="login-btn" class="btn btn-secondary btn-sm">
+            <i class="fa-solid fa-right-to-bracket"></i>
+            <span>Entrar</span>
+          </a>
+          <button
+            id="logout-btn"
+            class="btn btn-outline btn-sm hidden"
+            style="
+              color: var(--color-secondary);
+              border-color: var(--color-secondary);
+            "
+          >
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>Salir</span>
+          </button>
+          <button class="hamburger" id="hamburger" aria-label="Abrir menú">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <!-- ========== BANNER / HERO ========== -->
+    <section class="banner">
+      <div class="banner-content">
+        <span class="banner-welcome">Selamat Datang</span>
+        <h1 class="banner-title">
+          Descubre los sabores de <span>Indonesia</span>
+        </h1>
+        <p class="banner-subtitle">
+          Un viaje culinario por el archipiélago más extenso del mundo. Desde el
+          ardiente Rendang de Sumatra hasta el delicado Sate de Java, cada
+          platillo cuenta una historia de tradición y especias milenarias.
+        </p>
+        <div class="banner-buttons">
+          <a href="menu.html" class="btn btn-primary btn-lg">
+            <i class="fa-solid fa-utensils"></i> Ver nuestro menú
+          </a>
+          <a href="reservaciones.html" class="btn btn-secondary btn-lg">
+            <i class="fa-solid fa-calendar-check"></i> Reservar mesa
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== LAYOUT: SECTION + ASIDE ========== -->
+    <div class="main-layout">
+      <main class="main-section">
+        <!-- SECTION: Características -->
+        <section class="section">
+          <div class="section-header">
+            <span class="section-tag">Por qué elegirnos</span>
+            <h2 class="section-title">Una experiencia auténtica</h2>
+            <p class="section-description">
+              Rasa Nusantara significa "Sabor del Archipiélago". Traemos la
+              esencia de más de 17,000 islas indonesias a tu mesa, con recetas
+              transmitidas por generaciones.
+            </p>
+          </div>
+
+          <div class="features">
+            <div class="feature-card">
+              <div class="feature-icon">
+                <i class="fa-solid fa-fire-flame-curved"></i>
+              </div>
+              <h3>Especias Auténticas</h3>
+              <p>
+                Importamos directamente cúrcuma, galangal, lemongrass y sambal
+                desde Java y Sumatra.
+              </p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">
+                <i class="fa-solid fa-user-chef"></i>
+              </div>
+              <h3>Chef Indonesio</h3>
+              <p>
+                Nuestro chef nació y se formó en Bali, con más de 20 años
+                dominando la cocina nusantara.
+              </p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon"><i class="fa-solid fa-leaf"></i></div>
+              <h3>Ingredientes Frescos</h3>
+              <p>
+                Trabajamos con productores locales para ofrecer siempre el mejor
+                producto de temporada.
+              </p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon"><i class="fa-solid fa-heart"></i></div>
+              <h3>Ambiente Único</h3>
+              <p>
+                Decoración inspirada en templos balineses, con batik tradicional
+                y música gamelan de fondo.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <div class="ornament">✦ ✦ ✦</div>
+
+        <!-- SECTION: Platillos destacados -->
+        <section class="section">
+          <div class="section-header">
+            <span class="section-tag">Nuestros favoritos</span>
+            <h2 class="section-title">Platillos tradicionales</h2>
+            <p class="section-description">
+              Una selección de los platos más emblemáticos de nuestra carta,
+              preparados según las recetas originales de cada región.
+            </p>
+          </div>
+
+          <div class="dishes-grid" id="platillos-destacados">
+            <!-- Se llena con JS -->
+          </div>
+
+          <div class="text-center mt-3">
+            <a href="menu.html" class="btn btn-primary btn-lg">
+              <i class="fa-solid fa-book-open"></i> Ver menú completo
+            </a>
+          </div>
+        </section>
+
+        <!-- SECTION: CTA / Reservación -->
+        <section
+          class="section"
+          style="
+            background: linear-gradient(
+              135deg,
+              var(--color-dark-deep) 0%,
+              var(--color-primary-dark) 100%
+            );
+            border-radius: var(--radius-lg);
+            color: white;
+            padding: 50px 30px;
+            text-align: center;
+            margin-top: 40px;
+          "
+        >
+          <span class="text-decorative" style="color: var(--color-secondary)"
+            >¿Ocasión especial?</span
+          >
+          <h2 style="color: white; margin: 10px 0 15px">Reserva tu mesa hoy</h2>
+          <p
+            style="
+              max-width: 600px;
+              margin: 0 auto 25px;
+              color: var(--color-cream);
+            "
+          >
+            Aniversarios, cumpleaños, celebraciones íntimas o cenas de negocios.
+            Personalizamos tu experiencia con nuestros menús de 3, 4 o 5
+            tiempos.
+          </p>
+          <a href="reservaciones.html" class="btn btn-secondary btn-lg">
+            <i class="fa-solid fa-calendar-check"></i> Reservar ahora
+          </a>
+        </section>
+      </main>
+
+      <!-- ========== ASIDE ========== -->
+      <aside class="main-aside">
+        <div class="aside-widget">
+          <h4><i class="fa-solid fa-clock"></i> Horarios</h4>
+          <div class="hour-row">
+            <span>Lunes</span><span class="closed">Cerrado</span>
+          </div>
+          <div class="hour-row">
+            <span>🌤 Comida</span><span class="open">12:00 — 16:00</span>
+          </div>
+          <div class="hour-row">
+            <span>🌙 Cena</span><span class="open">18:00 — 22:00</span>
+          </div>
+          <div
+            style="
+              font-size: 0.78rem;
+              color: var(--color-text-light);
+              margin-top: 8px;
+              padding-top: 8px;
+              border-top: 1px dashed var(--color-border);
+            "
+          >
+            Martes a Domingo
+          </div>
+        </div>
+
+        <div class="aside-widget">
+          <h4><i class="fa-solid fa-location-dot"></i> Contacto</h4>
+          <div class="aside-contact">
+            <div class="aside-contact-item">
+              <i class="fa-solid fa-map-marker-alt"></i>
+              <span
+                >Av. Reforma 1234, Col. Centro<br />Ciudad de México, CDMX</span
+              >
+            </div>
+            <div class="aside-contact-item">
+              <i class="fa-solid fa-phone"></i>
+              <span>+52 55 1234-5678</span>
+            </div>
+            <div class="aside-contact-item">
+              <i class="fa-solid fa-envelope"></i>
+              <span>hola@rasanusantara.mx</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="aside-widget">
+          <h4><i class="fa-solid fa-star"></i> Sabías que...</h4>
+          <p
+            style="
+              font-size: 0.9rem;
+              color: var(--color-text-light);
+              line-height: 1.7;
+            "
+          >
+            El <strong>Rendang</strong> fue nombrado por CNN como el "plato más
+            delicioso del mundo" en 2011, y se origina en la región de
+            Minangkabau, Sumatra Occidental.
+          </p>
+          <p
+            style="
+              font-family: var(--font-decorative);
+              color: var(--color-primary);
+              text-align: center;
+              margin-top: 15px;
+              font-size: 1.3rem;
+            "
+          >
+            "Makan enak!"
+          </p>
+        </div>
+      </aside>
+    </div>
+
+    <!-- ========== FOOTER ========== -->
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-col">
+          <div class="footer-brand">
+            <div class="logo-icon">🍜</div>
+            <span class="footer-brand-text">RASA NUSANTARA</span>
+          </div>
+          <p>
+            Auténtica gastronomía indonesia en el corazón de la Ciudad de
+            México. Una experiencia culinaria que te transportará a Java, Bali y
+            Sumatra.
+          </p>
+          <div class="footer-social">
+            <a href="#" aria-label="Facebook"
+              ><i class="fa-brands fa-facebook-f"></i
+            ></a>
+            <a href="#" aria-label="Instagram"
+              ><i class="fa-brands fa-instagram"></i
+            ></a>
+            <a href="#" aria-label="Twitter"
+              ><i class="fa-brands fa-twitter"></i
+            ></a>
+            <a href="#" aria-label="WhatsApp"
+              ><i class="fa-brands fa-whatsapp"></i
+            ></a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h5>Navegación</h5>
+          <ul>
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="menu.html">Nuestro Menú</a></li>
+            <li><a href="reservaciones.html">Reservaciones</a></li>
+            <li><a href="login.html">Iniciar Sesión</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h5>Menús</h5>
+          <ul>
+            <li><a href="menu.html">Clásico (3 tiempos)</a></li>
+            <li><a href="menu.html">Formal (4 tiempos)</a></li>
+            <li><a href="menu.html">Gala (5 tiempos)</a></li>
+            <li><a href="menu.html">À la carte</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h5>Contacto</h5>
+          <div class="footer-contact-item">
+            <i class="fa-solid fa-map-marker-alt"></i>
+            <span>Av. Reforma 1234, CDMX</span>
+          </div>
+          <div class="footer-contact-item">
+            <i class="fa-solid fa-phone"></i>
+            <span>+52 55 1234-5678</span>
+          </div>
+          <div class="footer-contact-item">
+            <i class="fa-solid fa-envelope"></i>
+            <span>hola@rasanusantara.mx</span>
+          </div>
+          <div class="footer-contact-item">
+            <i class="fa-solid fa-clock"></i>
+            <span>Ma-Do · 12-16h y 18-22h</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>© 2026 Rasa Nusantara · Todos los derechos reservados</span>
+        <span
+          >Hecho con
+          <i class="fa-solid fa-heart" style="color: var(--color-primary)"></i>
+          en México</span
+        >
+      </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script type="module" src="js/main.js"></script>
+    <script type="module" src="js/home.js"></script>
+  </body>
+</html>

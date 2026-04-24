@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Reservaciones — Rasa Nusantara</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&family=Dancing+Script:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23C1272D'/%3E%3Ctext x='50' y='68' text-anchor='middle' font-size='58'%3E🍜%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+    <!-- ========== HEADER ========== -->
+    <header class="header" id="header">
+        <nav class="navbar">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">🍜</div>
+                <div class="logo-text">
+                    <span class="brand">RASA NUSANTARA</span>
+                    <span class="tagline">Sabor del Archipiélago</span>
+                </div>
+            </a>
+            <ul class="nav-menu" id="nav-menu">
+                <li><a href="index.html"><i class="fa-solid fa-house"></i> Inicio</a></li>
+                <li><a href="menu.html"><i class="fa-solid fa-utensils"></i> Menú</a></li>
+                <li><a href="reservaciones.html"><i class="fa-solid fa-calendar-check"></i> Reservar</a></li>
+                <li id="mis-reservas-link" class="hidden"><a href="mis-reservaciones.html"><i class="fa-solid fa-bookmark"></i> Mis Reservas</a></li>
+                <li id="admin-link" class="hidden"><a href="admin.html"><i class="fa-solid fa-user-shield"></i> Admin</a></li>
+            </ul>
+            <div class="nav-actions">
+                <div id="user-info" class="user-info hidden">
+                    <i class="fa-solid fa-user"></i><span class="user-name"></span>
+                </div>
+                <a href="login.html" id="login-btn" class="btn btn-secondary btn-sm">
+                    <i class="fa-solid fa-right-to-bracket"></i><span>Entrar</span>
+                </a>
+                <button id="logout-btn" class="btn btn-outline btn-sm hidden" style="color: var(--color-secondary); border-color: var(--color-secondary);">
+                    <i class="fa-solid fa-right-from-bracket"></i><span>Salir</span>
+                </button>
+                <button class="hamburger" id="hamburger" aria-label="Abrir menú">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- ========== BANNER ========== -->
+    <section class="banner banner-small">
+        <div class="banner-content">
+            <span class="banner-welcome">Tu historial</span>
+            <h1 class="banner-title">Mis <span>Reservaciones</span></h1>
+            <p class="banner-breadcrumb">
+                <a href="index.html"><i class="fa-solid fa-house"></i> Inicio</a>
+                <i class="fa-solid fa-chevron-right"></i>
+                Mis Reservaciones
+            </p>
+        </div>
+    </section>
+
+    <!-- ========== LAYOUT SECTION + ASIDE ========== -->
+    <div class="main-layout">
+        <main class="main-section">
+
+            <section class="section" style="padding-top: 20px;">
+
+                <!-- ====== FILTROS ====== -->
+                <div class="section-header" style="text-align: left; margin: 30px 0 15px;">
+                    <h2 class="section-title" style="font-size: 1.6rem;">Gestiona tus reservaciones</h2>
+                    <p style="color: var(--color-text-light); margin-top: 8px;">
+                        Filtra, cancela o elimina tus reservaciones. Recuerda: puedes cancelar
+                        hasta 4 horas antes de la hora reservada.
+                    </p>
+                </div>
+
+                <div class="table-area-filters">
+                    <button class="filter-btn mr-filter-btn active" data-mr-filter="todas">
+                        <i class="fa-solid fa-list"></i> Todas
+                    </button>
+                    <button class="filter-btn mr-filter-btn" data-mr-filter="proximas">
+                        <i class="fa-solid fa-calendar-day"></i> Próximas
+                    </button>
+                    <button class="filter-btn mr-filter-btn" data-mr-filter="pasadas">
+                        <i class="fa-solid fa-clock-rotate-left"></i> Pasadas
+                    </button>
+                    <button class="filter-btn mr-filter-btn" data-mr-filter="canceladas">
+                        <i class="fa-solid fa-xmark"></i> Canceladas
+                    </button>
+                </div>
+
+                <!-- ====== LISTA ====== -->
+                <div class="my-res-list" id="mis-reservas-container">
+                    <p class="empty-msg">Cargando tus reservaciones...</p>
+                </div>
+
+            </section>
+
+        </main>
+
+        <!-- ========== ASIDE ========== -->
+        <aside class="main-aside">
+
+            <div class="aside-widget" style="background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%); color: white;">
+                <h4 style="color: white; border-bottom-color: rgba(255,255,255,0.3);">
+                    <i class="fa-solid fa-calendar-plus" style="color: var(--color-secondary);"></i>
+                    Nueva Reservación
+                </h4>
+                <p style="font-size: 0.9rem; opacity: 0.95; margin-bottom: 15px;">
+                    ¿Quieres volver a visitarnos? Reserva tu próxima mesa en segundos.
+                </p>
+                <a href="reservaciones.html" class="btn btn-secondary w-100 btn-sm">
+                    <i class="fa-solid fa-calendar-check"></i> Reservar ahora
+                </a>
+            </div>
+
+            <div class="aside-widget">
+                <h4><i class="fa-solid fa-circle-info"></i> Estados de reservación</h4>
+                <ul style="font-size: 0.88rem;">
+                    <li>
+                        <span class="status-badge confirmed" style="margin-right: 8px;">Confirmada</span>
+                        <span>Tu mesa está lista</span>
+                    </li>
+                    <li style="margin-top: 8px;">
+                        <span class="status-badge pending" style="margin-right: 8px;">Pendiente</span>
+                        <span>Esperando confirmación</span>
+                    </li>
+                    <li style="margin-top: 8px;">
+                        <span class="status-badge cancelled" style="margin-right: 8px;">Cancelada</span>
+                        <span>Reservación anulada</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="aside-widget">
+                <h4><i class="fa-solid fa-triangle-exclamation"></i> Política de cancelación</h4>
+                <ul style="font-size: 0.85rem;">
+                    <li><i class="fa-solid fa-check"></i> <span>Cancelación gratis hasta 4h antes</span></li>
+                    <li><i class="fa-solid fa-check"></i> <span>Reprogramar sin cargo hasta 2h antes</span></li>
+                    <li><i class="fa-solid fa-check"></i> <span>Cambio de personas: avisar con anticipación</span></li>
+                </ul>
+            </div>
+
+            <div class="aside-widget">
+                <h4><i class="fa-solid fa-phone"></i> ¿Tienes dudas?</h4>
+                <p style="font-size: 0.9rem; color: var(--color-text-light);">
+                    Contáctanos si necesitas ayuda con una reservación específica.
+                </p>
+                <div class="aside-contact mt-2">
+                    <div class="aside-contact-item">
+                        <i class="fa-solid fa-phone"></i>
+                        <span><strong>+52 55 1234-5678</strong></span>
+                    </div>
+                    <div class="aside-contact-item">
+                        <i class="fa-solid fa-envelope"></i>
+                        <span>hola@rasanusantara.mx</span>
+                    </div>
+                </div>
+            </div>
+
+        </aside>
+    </div>
+
+    <!-- ========== FOOTER ========== -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-col">
+                <div class="footer-brand">
+                    <div class="logo-icon">🍜</div>
+                    <span class="footer-brand-text">RASA NUSANTARA</span>
+                </div>
+                <p>Auténtica gastronomía indonesia en CDMX.</p>
+                <div class="footer-social">
+                    <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#"><i class="fa-brands fa-twitter"></i></a>
+                    <a href="#"><i class="fa-brands fa-whatsapp"></i></a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h5>Navegación</h5>
+                <ul>
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="menu.html">Menú</a></li>
+                    <li><a href="reservaciones.html">Reservaciones</a></li>
+                    <li><a href="mis-reservaciones.html">Mis Reservas</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h5>Políticas</h5>
+                <ul>
+                    <li><a href="#">Términos y condiciones</a></li>
+                    <li><a href="#">Política de cancelación</a></li>
+                    <li><a href="#">Privacidad</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h5>Contacto</h5>
+                <div class="footer-contact-item"><i class="fa-solid fa-map-marker-alt"></i><span>Av. Reforma 1234, CDMX</span></div>
+                <div class="footer-contact-item"><i class="fa-solid fa-phone"></i><span>+52 55 1234-5678</span></div>
+                <div class="footer-contact-item"><i class="fa-solid fa-envelope"></i><span>hola@rasanusantara.mx</span></div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>© 2026 Rasa Nusantara · Todos los derechos reservados</span>
+            <span>Hecho con <i class="fa-solid fa-heart" style="color: var(--color-primary);"></i> en México</span>
+        </div>
+    </footer>
+
+    <script type="module" src="js/main.js"></script>
+    <script type="module" src="js/mis-reservaciones.js"></script>
+</body>
+</html>
