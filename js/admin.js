@@ -518,15 +518,6 @@ function renderUsuariosTab() {
                 </tbody>
             </table>
         </div>
-
-        <div class="form-alert info show mt-3" style="margin-top: 20px;">
-            <i class="fa-solid fa-info-circle"></i>
-            ${
-              USE_DEMO_MODE
-                ? "<strong>Modo Demo:</strong> usuarios leídos desde DEMO_USERS. Al activar Firebase, se leerán de la colección <code>users</code>."
-                : "<strong>Firebase activo:</strong> usuarios leídos desde la colección <code>users</code> de Firestore."
-            }
-        </div>
     `;
 }
 
@@ -1560,15 +1551,12 @@ function construirHTMLFactura(reserva) {
   <div style="background:linear-gradient(135deg,${c.rojo} 0%,#8B0000 100%);
        padding:28px 32px;border-radius:8px 8px 0 0;display:flex;
        justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
-    <div style="display:flex;align-items:center;gap:14px;">
-      <div style="width:58px;height:58px;background:rgba(255,255,255,0.15);
-           border-radius:50%;display:flex;align-items:center;justify-content:center;
-           font-size:1.8rem;border:2px solid ${c.dorado};">🍜</div>
-      <div>
-        <h1 style="margin:0 0 3px;font-family:'Playfair Display',serif;font-size:1.6rem;
-             color:#FFFFFF;font-weight:700;letter-spacing:0.02em;">Rasa Nusantara</h1>
-        <p style="margin:0;font-size:0.78rem;color:${c.dorado};font-style:italic;">
-          Cocina indonesia · Sabores del archipiélago</p>
+    <div style="display: flex; align-items: center; gap: 12px; color: #ffffff;">
+      <div style="width: 45px;height: 45px; background: ${c.dorado}; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; font-size: 1.5rem; overflow: hidden;flex-shrink: 0;"><img src="img/logo.png" alt="Rasa Nusantara" style="width: 100%; height: 100%; object-fit: cover; display: block;" /></div>
+      <div display: flex; flex-direction: column; line-height: 1.1;>
+        <span style="font-family: 'Playfair Display', serif; font-size: 1.3rem; color: ${c.dorado};font-weight: 700; letter-spacing: 1px;">Rasa Nusantara</span>
+        <span style="font-family: 'Dancing Script', cursive; font-size: 0.85rem; color: #ffffff;">Sabor del archipiélago</span>
       </div>
     </div>
     <div style="text-align:right;">

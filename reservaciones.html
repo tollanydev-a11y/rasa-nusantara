@@ -1,299 +1,510 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Reservaciones — Rasa Nusantara</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&family=Dancing+Script:wght@500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&family=Dancing+Script:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
 
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23C1272D'/%3E%3Ctext x='50' y='68' text-anchor='middle' font-size='58'%3E🍜%3C/text%3E%3C/svg%3E">
-</head>
-<body>
+    <link rel="icon" type="image/svg+xml" href="img/logo.png" />
+  </head>
+  <body>
     <!-- ========== HEADER ========== -->
     <header class="header" id="header">
-        <nav class="navbar">
-            <a href="index.html" class="logo">
-                <div class="logo-icon">🍜</div>
-                <div class="logo-text">
-                    <span class="brand">RASA NUSANTARA</span>
-                    <span class="tagline">Sabor del Archipiélago</span>
-                </div>
-            </a>
-            <ul class="nav-menu" id="nav-menu">
-                <li><a href="index.html"><i class="fa-solid fa-house"></i> Inicio</a></li>
-                <li><a href="menu.html"><i class="fa-solid fa-utensils"></i> Menú</a></li>
-                <li><a href="reservaciones.html"><i class="fa-solid fa-calendar-check"></i> Reservar</a></li>
-                <li id="mis-reservas-link" class="hidden"><a href="mis-reservaciones.html"><i class="fa-solid fa-bookmark"></i> Mis Reservas</a></li>
-                <li id="admin-link" class="hidden"><a href="admin.html"><i class="fa-solid fa-user-shield"></i> Admin</a></li>
-            </ul>
-            <div class="nav-actions">
-                <div id="user-info" class="user-info hidden">
-                    <i class="fa-solid fa-user"></i><span class="user-name"></span>
-                </div>
-                <a href="login.html" id="login-btn" class="btn btn-secondary btn-sm">
-                    <i class="fa-solid fa-right-to-bracket"></i><span>Entrar</span>
-                </a>
-                <button id="logout-btn" class="btn btn-outline btn-sm hidden" style="color: var(--color-secondary); border-color: var(--color-secondary);">
-                    <i class="fa-solid fa-right-from-bracket"></i><span>Salir</span>
-                </button>
-                <button class="hamburger" id="hamburger" aria-label="Abrir menú">
-                    <span></span><span></span><span></span>
-                </button>
-            </div>
-        </nav>
+      <nav class="navbar">
+        <a href="index.html" class="logo">
+          <div class="logo-icon">
+            <img src="img/logo.png" alt="Rasa Nusantara" />
+          </div>
+          <div class="logo-text">
+            <span class="brand">RASA NUSANTARA</span>
+            <span class="tagline">Sabor del Archipiélago</span>
+          </div>
+        </a>
+        <ul class="nav-menu" id="nav-menu">
+          <li>
+            <a href="index.html"><i class="fa-solid fa-house"></i> Inicio</a>
+          </li>
+          <li>
+            <a href="menu.html"><i class="fa-solid fa-utensils"></i> Menú</a>
+          </li>
+          <li>
+            <a href="reservaciones.html"
+              ><i class="fa-solid fa-calendar-check"></i> Reservar</a
+            >
+          </li>
+          <li id="mis-reservas-link" class="hidden">
+            <a href="mis-reservaciones.html"
+              ><i class="fa-solid fa-bookmark"></i> Mis Reservas</a
+            >
+          </li>
+          <li id="admin-link" class="hidden">
+            <a href="admin.html"
+              ><i class="fa-solid fa-user-shield"></i> Admin</a
+            >
+          </li>
+        </ul>
+        <div class="nav-actions">
+          <div id="user-info" class="user-info hidden">
+            <i class="fa-solid fa-user"></i><span class="user-name"></span>
+          </div>
+          <a href="login.html" id="login-btn" class="btn btn-secondary btn-sm">
+            <i class="fa-solid fa-right-to-bracket"></i><span>Entrar</span>
+          </a>
+          <button
+            id="logout-btn"
+            class="btn btn-outline btn-sm hidden"
+            style="
+              color: var(--color-secondary);
+              border-color: var(--color-secondary);
+            "
+          >
+            <i class="fa-solid fa-right-from-bracket"></i><span>Salir</span>
+          </button>
+          <button class="hamburger" id="hamburger" aria-label="Abrir menú">
+            <span></span><span></span><span></span>
+          </button>
+        </div>
+      </nav>
     </header>
 
     <!-- ========== BANNER ========== -->
     <section class="banner banner-small">
-        <div class="banner-content">
-            <span class="banner-welcome">Reserva tu mesa</span>
-            <h1 class="banner-title">Asegura tu <span>experiencia</span></h1>
-            <p class="banner-breadcrumb">
-                <a href="index.html"><i class="fa-solid fa-house"></i> Inicio</a>
-                <i class="fa-solid fa-chevron-right"></i>
-                Reservaciones
-            </p>
-        </div>
+      <div class="banner-content">
+        <span class="banner-welcome">Reserva tu mesa</span>
+        <h1 class="banner-title">Asegura tu <span>experiencia</span></h1>
+        <p class="banner-breadcrumb">
+          <a href="index.html"><i class="fa-solid fa-house"></i> Inicio</a>
+          <i class="fa-solid fa-chevron-right"></i>
+          Reservaciones
+        </p>
+      </div>
     </section>
 
     <!-- ========== LAYOUT SECTION + ASIDE ========== -->
     <div class="main-layout">
-        <main class="main-section">
+      <main class="main-section">
+        <section class="section" style="padding-top: 20px">
+          <div
+            class="section-header"
+            style="text-align: left; margin-bottom: 30px"
+          >
+            <h2 class="section-title" style="font-size: 2rem">
+              Nueva Reservación
+            </h2>
+            <p style="color: var(--color-text-light); margin-top: 10px">
+              Completa los detalles de tu visita. Te confirmaremos por correo en
+              las próximas horas.
+            </p>
+          </div>
 
-            <section class="section" style="padding-top: 20px;">
-                <div class="section-header" style="text-align: left; margin-bottom: 30px;">
-                    <h2 class="section-title" style="font-size: 2rem;">Nueva Reservación</h2>
-                    <p style="color: var(--color-text-light); margin-top: 10px;">
-                        Completa los detalles de tu visita. Te confirmaremos por correo en las próximas horas.
-                    </p>
+          <form
+            id="reservacion-form"
+            class="form-container"
+            style="max-width: none"
+          >
+            <h3
+              style="
+                color: var(--color-primary);
+                margin-bottom: 15px;
+                font-size: 1.1rem;
+              "
+            >
+              <i class="fa-solid fa-calendar"></i> 1. Elige tu día y horario
+            </h3>
+
+            <!-- ======== LAYOUT 50/50 Calendario + Form-row ======== -->
+            <div class="reservation-two-cols">
+              <!-- Izquierda: Calendario -->
+              <div class="calendar-panel" id="calendar-container">
+                <div class="cal-header">
+                  <button
+                    type="button"
+                    class="cal-nav"
+                    id="cal-prev"
+                    aria-label="Mes anterior"
+                  >
+                    ‹
+                  </button>
+                  <h3 id="cal-title">Cargando…</h3>
+                  <button
+                    type="button"
+                    class="cal-nav"
+                    id="cal-next"
+                    aria-label="Mes siguiente"
+                  >
+                    ›
+                  </button>
                 </div>
 
-                <form id="reservacion-form" class="form-container" style="max-width: none;">
-
-                    <h3 style="color: var(--color-primary); margin-bottom: 15px; font-size: 1.1rem;">
-                        <i class="fa-solid fa-calendar"></i> 1. Elige tu día y horario
-                    </h3>
-
-                    <!-- ======== LAYOUT 50/50 Calendario + Form-row ======== -->
-                    <div class="reservation-two-cols">
-                        <!-- Izquierda: Calendario -->
-                        <div class="calendar-panel" id="calendar-container">
-                            <div class="cal-header">
-                                <button type="button" class="cal-nav" id="cal-prev" aria-label="Mes anterior">‹</button>
-                                <h3 id="cal-title">Cargando…</h3>
-                                <button type="button" class="cal-nav" id="cal-next" aria-label="Mes siguiente">›</button>
-                            </div>
-
-                            <div class="cal-legend">
-                                <span class="leg-item"><span class="dot dot--ok"></span>Disponible</span>
-                                <span class="leg-item"><span class="dot dot--partial"></span>Parcial</span>
-                                <span class="leg-item"><span class="dot dot--full"></span>Lleno</span>
-                                <span class="leg-item"><span class="dot dot--closed"></span>Cerrado</span>
-                            </div>
-
-                            <div class="cal-grid" id="calendar-grid">
-                                <!-- Se llena con JS -->
-                            </div>
-                        </div>
-
-                        <!-- Derecha: Fecha, Hora, Personas -->
-                        <div class="form-side">
-                            <h4><i class="fa-solid fa-sliders"></i> Detalles de tu reserva</h4>
-
-                            <div class="form-group">
-                                <label><i class="fa-solid fa-calendar-day"></i> Fecha seleccionada</label>
-                                <input type="text" class="form-control" id="fecha-display" readonly placeholder="Selecciona una fecha en el calendario">
-                            </div>
-
-                            <div class="form-group">
-                                <label><i class="fa-solid fa-clock"></i> Hora</label>
-                                <select class="form-control" id="hora-reserva" required disabled>
-                                    <option value="">-- Selecciona fecha primero --</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label><i class="fa-solid fa-users"></i> Personas</label>
-                                <input type="number" class="form-control" id="personas-reserva" value="2" min="1" max="12" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label>
-                                    <i class="fa-solid fa-id-card"></i> Nombres de los comensales
-                                    <span style="font-weight: normal; color: var(--color-text-light); font-size: 0.8rem;">(opcional)</span>
-                                </label>
-                                <div class="personas-nombres-container" id="personas-nombres-container">
-                                    <!-- Generado dinámicamente por JS según número de personas -->
-                                </div>
-                                <small style="display: block; color: var(--color-text-light); font-size: 0.78rem; margin-top: 6px;">
-                                    Si los agregas, cada comensal podrá elegir sus propios platillos.
-                                </small>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- ======== MENÚS POR TIEMPOS (tarjetas compactas) ======== -->
-                    <h3 style="color: var(--color-primary); margin: 25px 0 10px; font-size: 1.1rem;">
-                        <i class="fa-solid fa-utensils"></i> 2. Elige tu experiencia gastronómica
-                    </h3>
-                    <p style="color: var(--color-text-light); font-size: 0.9rem; margin-bottom: 10px;">
-                        Selecciona el tipo de menú. Una vez confirmada tu reserva por el restaurante,
-                        podrás personalizar los platillos de cada tiempo desde la sección <strong>Menú</strong>.
-                    </p>
-
-                    <div class="menu-tiempos-compact" id="menu-tiempos-reserva">
-                        <!-- Se genera dinámicamente en JS -->
-                    </div>
-
-                    <!-- ======== ÁREAS ======== -->
-                    <h3 style="color: var(--color-primary); margin: 25px 0 15px; font-size: 1.1rem;">
-                        <i class="fa-solid fa-location-dot"></i> 3. Área del restaurante
-                    </h3>
-                    <div class="area-selector" id="areas-container"></div>
-
-                    <!-- ======== MESAS ======== -->
-                    <h3 style="color: var(--color-primary); margin: 25px 0 15px; font-size: 1.1rem;">
-                        <i class="fa-solid fa-chair"></i> 4. Selecciona tu mesa
-                    </h3>
-                    <div id="mesas-container"></div>
-                    <div class="mesa-legend" id="mesas-legend" style="display: none;">
-                        <div class="mesa-legend-item"><div class="legend-box available"></div> Disponible</div>
-                        <div class="mesa-legend-item"><div class="legend-box busy"></div> Ocupada</div>
-                        <div class="mesa-legend-item"><div class="legend-box selected-legend"></div> Seleccionada</div>
-                    </div>
-
-                    <!-- ======== COMENTARIOS ======== -->
-                    <h3 style="color: var(--color-primary); margin: 25px 0 15px; font-size: 1.1rem;">
-                        <i class="fa-solid fa-comment"></i> 5. Comentarios (opcional)
-                    </h3>
-                    <div class="form-group">
-                        <label>Peticiones especiales, alergias, ocasión, etc.</label>
-                        <textarea class="form-control" id="comentarios-reserva" rows="3" placeholder="Ej: Aniversario, silla para bebé, mesa lejos del aire acondicionado..."></textarea>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary btn-lg w-100 mt-2">
-                        <i class="fa-solid fa-calendar-check"></i> Confirmar Reservación
-                    </button>
-                </form>
-
-                <!-- ====== MIS RESERVACIONES (resumen rápido) ====== -->
-                <div class="my-reservations-section">
-                    <h3><i class="fa-solid fa-bookmark"></i> Mis últimas reservaciones</h3>
-                    <div class="my-res-list" id="mis-reservaciones-container">
-                        <p class="empty-msg">Cargando...</p>
-                    </div>
-                    <div style="text-align: center; margin-top: 15px;">
-                        <a href="mis-reservaciones.html" class="btn btn-outline btn-sm">
-                            <i class="fa-solid fa-list"></i> Ver todas mis reservas
-                        </a>
-                    </div>
+                <div class="cal-legend">
+                  <span class="leg-item"
+                    ><span class="dot dot--ok"></span>Disponible</span
+                  >
+                  <span class="leg-item"
+                    ><span class="dot dot--partial"></span>Parcial</span
+                  >
+                  <span class="leg-item"
+                    ><span class="dot dot--full"></span>Lleno</span
+                  >
+                  <span class="leg-item"
+                    ><span class="dot dot--closed"></span>Cerrado</span
+                  >
                 </div>
 
-            </section>
-
-        </main>
-
-        <!-- ========== ASIDE ========== -->
-        <aside class="main-aside">
-
-            <div class="aside-widget">
-                <div id="resumen-reserva">
-                    <h4><i class="fa-solid fa-receipt"></i> Resumen de tu reservación</h4>
-                    <p style="color: var(--color-text-light); font-size: 0.9rem; text-align: center; padding: 20px 0;">
-                        Completa el formulario para ver el resumen
-                    </p>
+                <div class="cal-grid" id="calendar-grid">
+                  <!-- Se llena con JS -->
                 </div>
+              </div>
+
+              <!-- Derecha: Fecha, Hora, Personas -->
+              <div class="form-side">
+                <h4>
+                  <i class="fa-solid fa-sliders"></i> Detalles de tu reserva
+                </h4>
+
+                <div class="form-group">
+                  <label
+                    ><i class="fa-solid fa-calendar-day"></i> Fecha
+                    seleccionada</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="fecha-display"
+                    readonly
+                    placeholder="Selecciona una fecha en el calendario"
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label><i class="fa-solid fa-clock"></i> Hora</label>
+                  <select
+                    class="form-control"
+                    id="hora-reserva"
+                    required
+                    disabled
+                  >
+                    <option value="">-- Selecciona fecha primero --</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label><i class="fa-solid fa-users"></i> Personas</label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="personas-reserva"
+                    value="2"
+                    min="1"
+                    max="12"
+                    required
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label>
+                    <i class="fa-solid fa-id-card"></i> Nombres de los
+                    comensales
+                    <span
+                      style="
+                        font-weight: normal;
+                        color: var(--color-text-light);
+                        font-size: 0.8rem;
+                      "
+                      >(opcional)</span
+                    >
+                  </label>
+                  <div
+                    class="personas-nombres-container"
+                    id="personas-nombres-container"
+                  >
+                    <!-- Generado dinámicamente por JS según número de personas -->
+                  </div>
+                  <small
+                    style="
+                      display: block;
+                      color: var(--color-text-light);
+                      font-size: 0.78rem;
+                      margin-top: 6px;
+                    "
+                  >
+                    Si los agregas, cada comensal podrá elegir sus propios
+                    platillos.
+                  </small>
+                </div>
+              </div>
             </div>
 
-            <div class="aside-widget">
-                <h4><i class="fa-solid fa-triangle-exclamation"></i> Políticas</h4>
-                <ul style="font-size: 0.88rem;">
-                    <li><i class="fa-solid fa-check"></i> <span>Reservación mínima 2 horas antes</span></li>
-                    <li><i class="fa-solid fa-check"></i> <span>Cancelación gratis hasta 4h antes</span></li>
-                    <li><i class="fa-solid fa-check"></i> <span>Grupos +8 personas: aparte</span></li>
-                    <li><i class="fa-solid fa-check"></i> <span>Mascotas solo en terraza</span></li>
-                </ul>
+            <!-- ======== MENÚS POR TIEMPOS (tarjetas compactas) ======== -->
+            <h3
+              style="
+                color: var(--color-primary);
+                margin: 25px 0 10px;
+                font-size: 1.1rem;
+              "
+            >
+              <i class="fa-solid fa-utensils"></i> 2. Elige tu experiencia
+              gastronómica
+            </h3>
+            <p
+              style="
+                color: var(--color-text-light);
+                font-size: 0.9rem;
+                margin-bottom: 10px;
+              "
+            >
+              Selecciona el tipo de menú. Una vez confirmada tu reserva por el
+              restaurante, podrás personalizar los platillos de cada tiempo
+              desde la sección <strong>Menú</strong>.
+            </p>
+
+            <div class="menu-tiempos-compact" id="menu-tiempos-reserva">
+              <!-- Se genera dinámicamente en JS -->
             </div>
 
-            <div class="aside-widget">
-                <h4><i class="fa-solid fa-clock"></i> Horarios</h4>
-                <div class="hour-row"><span>Lunes</span><span class="closed">Cerrado</span></div>
-                <div class="hour-row"><span>🌤 Comida</span><span class="open">12:00 — 16:00</span></div>
-                <div class="hour-row"><span>🌙 Cena</span><span class="open">18:00 — 22:00</span></div>
-                <div style="font-size: 0.78rem; color: var(--color-text-light); margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--color-border);">
-                    Martes a Domingo
-                </div>
+            <!-- ======== ÁREAS ======== -->
+            <h3
+              style="
+                color: var(--color-primary);
+                margin: 25px 0 15px;
+                font-size: 1.1rem;
+              "
+            >
+              <i class="fa-solid fa-location-dot"></i> 3. Área del restaurante
+            </h3>
+            <div class="area-selector" id="areas-container"></div>
+
+            <!-- ======== MESAS ======== -->
+            <h3
+              style="
+                color: var(--color-primary);
+                margin: 25px 0 15px;
+                font-size: 1.1rem;
+              "
+            >
+              <i class="fa-solid fa-chair"></i> 4. Selecciona tu mesa
+            </h3>
+            <div id="mesas-container"></div>
+            <div class="mesa-legend" id="mesas-legend" style="display: none">
+              <div class="mesa-legend-item">
+                <div class="legend-box available"></div>
+                Disponible
+              </div>
+              <div class="mesa-legend-item">
+                <div class="legend-box busy"></div>
+                Ocupada
+              </div>
+              <div class="mesa-legend-item">
+                <div class="legend-box selected-legend"></div>
+                Seleccionada
+              </div>
             </div>
 
-            <div class="aside-widget">
-                <h4><i class="fa-solid fa-phone"></i> ¿Necesitas ayuda?</h4>
-                <p style="font-size: 0.9rem; color: var(--color-text-light);">
-                    Para grupos grandes o eventos privados, llámanos directamente.
-                </p>
-                <div class="aside-contact mt-2">
-                    <div class="aside-contact-item">
-                        <i class="fa-solid fa-phone"></i>
-                        <span><strong>+52 55 1234-5678</strong></span>
-                    </div>
-                </div>
+            <!-- ======== COMENTARIOS ======== -->
+            <h3
+              style="
+                color: var(--color-primary);
+                margin: 25px 0 15px;
+                font-size: 1.1rem;
+              "
+            >
+              <i class="fa-solid fa-comment"></i> 5. Comentarios (opcional)
+            </h3>
+            <div class="form-group">
+              <label>Peticiones especiales, alergias, ocasión, etc.</label>
+              <textarea
+                class="form-control"
+                id="comentarios-reserva"
+                rows="3"
+                placeholder="Ej: Aniversario, silla para bebé, mesa lejos del aire acondicionado..."
+              ></textarea>
             </div>
 
-        </aside>
+            <button type="submit" class="btn btn-primary btn-lg w-100 mt-2">
+              <i class="fa-solid fa-calendar-check"></i> Confirmar Reservación
+            </button>
+          </form>
+
+          <!-- ====== MIS RESERVACIONES (resumen rápido) ====== -->
+          <div class="my-reservations-section">
+            <h3>
+              <i class="fa-solid fa-bookmark"></i> Mis últimas reservaciones
+            </h3>
+            <div class="my-res-list" id="mis-reservaciones-container">
+              <p class="empty-msg">Cargando...</p>
+            </div>
+            <div style="text-align: center; margin-top: 15px">
+              <a href="mis-reservaciones.html" class="btn btn-outline btn-sm">
+                <i class="fa-solid fa-list"></i> Ver todas mis reservas
+              </a>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <!-- ========== ASIDE ========== -->
+      <aside class="main-aside">
+        <div class="aside-widget">
+          <div id="resumen-reserva">
+            <h4>
+              <i class="fa-solid fa-receipt"></i> Resumen de tu reservación
+            </h4>
+            <p
+              style="
+                color: var(--color-text-light);
+                font-size: 0.9rem;
+                text-align: center;
+                padding: 20px 0;
+              "
+            >
+              Completa el formulario para ver el resumen
+            </p>
+          </div>
+        </div>
+
+        <div class="aside-widget">
+          <h4><i class="fa-solid fa-triangle-exclamation"></i> Políticas</h4>
+          <ul style="font-size: 0.88rem">
+            <li>
+              <i class="fa-solid fa-check"></i>
+              <span>Reservación mínima 2 horas antes</span>
+            </li>
+            <li>
+              <i class="fa-solid fa-check"></i>
+              <span>Cancelación gratis hasta 4h antes</span>
+            </li>
+            <li>
+              <i class="fa-solid fa-check"></i>
+              <span>Grupos +8 personas: aparte</span>
+            </li>
+            <li>
+              <i class="fa-solid fa-check"></i>
+              <span>Mascotas solo en terraza</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="aside-widget">
+          <h4><i class="fa-solid fa-clock"></i> Horarios</h4>
+          <div class="hour-row">
+            <span>Lunes</span><span class="closed">Cerrado</span>
+          </div>
+          <div class="hour-row">
+            <span>🌤 Comida</span><span class="open">12:00 — 16:00</span>
+          </div>
+          <div class="hour-row">
+            <span>🌙 Cena</span><span class="open">18:00 — 22:00</span>
+          </div>
+          <div
+            style="
+              font-size: 0.78rem;
+              color: var(--color-text-light);
+              margin-top: 8px;
+              padding-top: 8px;
+              border-top: 1px dashed var(--color-border);
+            "
+          >
+            Martes a Domingo
+          </div>
+        </div>
+
+        <div class="aside-widget">
+          <h4><i class="fa-solid fa-phone"></i> ¿Necesitas ayuda?</h4>
+          <p style="font-size: 0.9rem; color: var(--color-text-light)">
+            Para grupos grandes o eventos privados, llámanos directamente.
+          </p>
+          <div class="aside-contact mt-2">
+            <div class="aside-contact-item">
+              <i class="fa-solid fa-phone"></i>
+              <span><strong>+52 55 1234-5678</strong></span>
+            </div>
+          </div>
+        </div>
+      </aside>
     </div>
 
     <!-- ========== FOOTER ========== -->
     <footer class="footer">
-        <div class="footer-content">
-            <div class="footer-col">
-                <div class="footer-brand">
-                    <div class="logo-icon">🍜</div>
-                    <span class="footer-brand-text">RASA NUSANTARA</span>
-                </div>
-                <p>Auténtica gastronomía indonesia en CDMX.</p>
-                <div class="footer-social">
-                    <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
-                    <a href="#"><i class="fa-brands fa-instagram"></i></a>
-                    <a href="#"><i class="fa-brands fa-twitter"></i></a>
-                    <a href="#"><i class="fa-brands fa-whatsapp"></i></a>
-                </div>
+      <div class="footer-content">
+        <div class="footer-col">
+          <div class="footer-brand">
+            <div class="logo-icon">
+              <img src="img/logo.png" alt="Rasa Nusantara" />
             </div>
-            <div class="footer-col">
-                <h5>Navegación</h5>
-                <ul>
-                    <li><a href="index.html">Inicio</a></li>
-                    <li><a href="menu.html">Menú</a></li>
-                    <li><a href="reservaciones.html">Reservaciones</a></li>
-                    <li><a href="mis-reservaciones.html">Mis Reservas</a></li>
-                </ul>
-            </div>
-            <div class="footer-col">
-                <h5>Políticas</h5>
-                <ul>
-                    <li><a href="#">Términos y condiciones</a></li>
-                    <li><a href="#">Política de cancelación</a></li>
-                    <li><a href="#">Privacidad</a></li>
-                </ul>
-            </div>
-            <div class="footer-col">
-                <h5>Contacto</h5>
-                <div class="footer-contact-item"><i class="fa-solid fa-map-marker-alt"></i><span>Av. Reforma 1234, CDMX</span></div>
-                <div class="footer-contact-item"><i class="fa-solid fa-phone"></i><span>+52 55 1234-5678</span></div>
-                <div class="footer-contact-item"><i class="fa-solid fa-envelope"></i><span>hola@rasanusantara.mx</span></div>
-            </div>
+            <span class="footer-brand-text">RASA NUSANTARA</span>
+          </div>
+          <p>Auténtica gastronomía indonesia en CDMX.</p>
+          <div class="footer-social">
+            <a href="https://www.facebook.com" target="_blank"
+              ><i class="fa-brands fa-facebook-f"></i
+            ></a>
+            <a href="https://www.instagram.com" target="_blank"
+              ><i class="fa-brands fa-instagram"></i
+            ></a>
+            <a href="https://x.com" target="_blank"
+              ><i class="fa-brands fa-twitter"></i
+            ></a>
+            <a href="https://www.whatsapp.com" target="_blank"
+              ><i class="fa-brands fa-whatsapp"></i
+            ></a>
+          </div>
         </div>
-        <div class="footer-bottom">
-            <span>© 2026 Rasa Nusantara · Todos los derechos reservados</span>
-            <span>Hecho con <i class="fa-solid fa-heart" style="color: var(--color-primary);"></i> en México</span>
+        <div class="footer-col">
+          <h5>Navegación</h5>
+          <ul>
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="menu.html">Menú</a></li>
+            <li><a href="reservaciones.html">Reservaciones</a></li>
+            <li><a href="mis-reservaciones.html">Mis Reservas</a></li>
+          </ul>
         </div>
+        <div class="footer-col">
+          <h5>Políticas</h5>
+          <ul>
+            <li><a href="#">Términos y condiciones</a></li>
+            <li><a href="#">Política de cancelación</a></li>
+            <li><a href="#">Privacidad</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>Contacto</h5>
+          <div class="footer-contact-item">
+            <i class="fa-solid fa-map-marker-alt"></i
+            ><span>Av. Reforma 1234, CDMX</span>
+          </div>
+          <div class="footer-contact-item">
+            <i class="fa-solid fa-phone"></i><span>+52 55 1234-5678</span>
+          </div>
+          <div class="footer-contact-item">
+            <i class="fa-solid fa-envelope"></i
+            ><span>hola@rasanusantara.mx</span>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 Rasa Nusantara · Todos los derechos reservados</span>
+        <span
+          >Hecho con
+          <i class="fa-solid fa-heart" style="color: var(--color-primary)"></i>
+          en México</span
+        >
+      </div>
     </footer>
 
     <script type="module" src="js/main.js"></script>
     <script type="module" src="js/reservaciones.js"></script>
-</body>
+  </body>
 </html>

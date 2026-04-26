@@ -1,651 +1,961 @@
 /* ===================================================
-   RASA NUSANTARA - Responsive Design
-   Breakpoints: 1200px (PC), 756px (Tablet), 480px (Móvil)
+   RASA NUSANTARA — Responsive Design
+   Breakpoints:
+     1135px  Hamburger activo / aside apilado
+      900px  Reservaciones two-cols → 1 col
+      756px  Tablet general
+      600px  Phablet
+      480px  Móvil estándar
+      360px  Móvil extra pequeño
    =================================================== */
 
-/* ============================================
-   TABLET Y MENOR - Menú hamburguesa activo
-   Breakpoint 1135px: evita el wrap icono/texto en
-   el rango 995-1135 donde antes se rompía el nav
-   ============================================ */
+/* ============================================================
+   1. PANTALLAS MUY GRANDES (≥ 1600px)
+   ============================================================ */
+@media (min-width: 1600px) {
+  .banner-title {
+    font-size: 5rem;
+  }
+
+  .main-layout {
+    width: 82%;
+  }
+}
+
+/* ============================================================
+   2. PC GRANDE (≤ 1280px)
+   ============================================================ */
+@media (max-width: 1280px) {
+  .main-layout {
+    width: 94%;
+    gap: 30px;
+  }
+}
+
+/* ============================================================
+   3. HAMBURGER ACTIVO (≤ 1135px)
+   ============================================================ */
 @media (max-width: 1135px) {
-    h1 { font-size: 2.5rem; }
-    h2 { font-size: 2rem; }
-    h3 { font-size: 1.5rem; }
+  h1 {
+    font-size: 2.5rem;
+  }
+  h2 {
+    font-size: 2rem;
+  }
+  h3 {
+    font-size: 1.5rem;
+  }
 
-    .banner-title { font-size: 3rem; }
-    .banner-small .banner-title { font-size: 2.5rem; }
+  .banner-title {
+    font-size: 3rem;
+  }
+  .banner-small .banner-title {
+    font-size: 2.5rem;
+  }
 
-    /* Navegación responsive */
-    .hamburger {
-        display: block;
-    }
+  /* Hamburger */
+  .hamburger {
+    display: block;
+  }
 
-    .nav-menu {
-        position: fixed;
-        top: 0;
-        right: -100%;
-        width: 80%;
-        max-width: 320px;
-        height: 100vh;
-        background: var(--color-dark-deep);
-        flex-direction: column;
-        padding: 90px 25px 25px;
-        transition: right 0.3s ease;
-        box-shadow: var(--shadow-xl);
-        gap: 8px;
-        align-items: stretch;
-        overflow-y: auto;
-        border-left: 3px solid var(--color-secondary);
-    }
+  .nav-menu {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 80%;
+    max-width: 320px;
+    height: 100vh;
+    background: var(--color-dark-deep);
+    flex-direction: column;
+    padding: 90px 25px 25px;
+    transition: right 0.3s ease;
+    box-shadow: var(--shadow-xl);
+    gap: 8px;
+    align-items: stretch;
+    overflow-y: auto;
+    border-left: 3px solid var(--color-secondary);
+    z-index: 1001;
+  }
 
-    .nav-menu.active {
-        right: 0;
-    }
+  .nav-menu.active {
+    right: 0;
+  }
 
-    .nav-menu li {
-        width: 100%;
-    }
+  .nav-menu li {
+    width: 100%;
+  }
 
-    .nav-menu li a {
-        display: block;
-        padding: 14px 18px;
-        border-radius: var(--radius-sm);
-        border-bottom: 1px solid rgba(212, 175, 55, 0.15);
-    }
+  .nav-menu li a {
+    display: flex;
+    padding: 14px 18px;
+    border-radius: var(--radius-sm);
+    border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+  }
 
-    .nav-menu li a:hover {
-        background: rgba(193, 39, 45, 0.25);
-    }
+  .nav-menu li a:hover {
+    background: rgba(193, 39, 45, 0.25);
+  }
 
-    .nav-actions {
-        gap: 8px;
-    }
+  .nav-actions {
+    gap: 8px;
+  }
 
-    .user-info {
-        font-size: 0.82rem;
-        padding: 5px 10px;
-    }
+  .user-info {
+    font-size: 0.82rem;
+    padding: 5px 10px;
+  }
 
-    .user-info span:not(.user-name) {
-        display: none;
-    }
+  .menu-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: var(--transition);
+  }
+  .menu-overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
 
-    /* Overlay al abrir menú */
-    .menu-overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 999;
-        opacity: 0;
-        visibility: hidden;
-        transition: var(--transition);
-    }
+  /* Layout */
+  .main-layout {
+    grid-template-columns: 1fr;
+    gap: 30px;
+    width: 94%;
+  }
 
-    .menu-overlay.active {
-        opacity: 1;
-        visibility: visible;
-    }
+  .main-aside {
+    position: static;
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+  }
 
-    /* Layout (section + aside) */
-    .main-layout {
-        grid-template-columns: 1fr;
-        gap: 30px;
-    }
+  .main-aside .aside-widget {
+    margin-bottom: 0;
+  }
 
-    .main-aside {
-        position: static;
-    }
+  /* Footer 2 cols */
+  .footer-content {
+    grid-template-columns: 1fr 1fr;
+    gap: 35px;
+  }
 
-    /* Footer */
-    .footer-content {
-        grid-template-columns: 1fr 1fr;
-        gap: 35px;
-    }
+  /* Menú tiempos */
+  .menu-tiempos {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .menu-tiempos-compact {
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
 
-    /* Menú de tiempos */
-    .menu-tiempos {
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
+  /* Stats admin 2 cols */
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .tables-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
 }
 
-/* ============================================
-   TABLET (756px y menor)
-   ============================================ */
+/* ============================================================
+   4. RESERVACIONES TWO-COLS → 1 (≤ 900px)
+   ============================================================ */
+@media (max-width: 900px) {
+  .reservation-two-cols {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+  .reservation-two-cols .form-side {
+    min-height: auto;
+  }
+}
+
+/* ============================================================
+   5. TABLET ESTÁNDAR (≤ 756px)
+   ============================================================ */
 @media (max-width: 756px) {
-    html { font-size: 15px; }
+  html {
+    font-size: 15px;
+  }
 
-    h1 { font-size: 2rem; }
-    h2 { font-size: 1.75rem; }
+  h1 {
+    font-size: 2rem;
+  }
+  h2 {
+    font-size: 1.75rem;
+  }
 
-    .container {
-        padding: 0 15px;
-    }
+  .navbar {
+    padding: 12px 15px;
+  }
 
-    .navbar {
-        padding: 12px 15px;
-    }
+  .logo-icon {
+    width: 40px;
+    height: 40px;
+  }
+  .logo-text .brand {
+    font-size: 1.1rem;
+  }
+  .logo-text .tagline {
+    font-size: 0.75rem;
+  }
 
-    .logo-icon {
-        width: 40px;
-        height: 40px;
-        font-size: 1.3rem;
-    }
+  /* Banner */
+  .banner {
+    min-height: 70vh;
+    margin-top: 68px;
+  }
+  .banner-title {
+    font-size: 2.5rem;
+  }
+  .banner-subtitle {
+    font-size: 1rem;
+  }
+  .banner-welcome {
+    font-size: 1.4rem;
+  }
+  .banner-small {
+    min-height: 35vh;
+  }
+  .banner-small .banner-title {
+    font-size: 2rem;
+  }
+  .banner-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+  .banner-buttons .btn {
+    width: 100%;
+    max-width: 280px;
+  }
 
-    .logo-text .brand {
-        font-size: 1.1rem;
-    }
+  /* Secciones */
+  .section {
+    padding: 40px 0;
+  }
+  .section-title {
+    font-size: 1.8rem;
+  }
 
-    .logo-text .tagline {
-        font-size: 0.75rem;
-    }
+  /* Layout */
+  .main-layout {
+    padding: 40px 15px;
+    width: 100%;
+  }
+  .main-aside {
+    grid-template-columns: 1fr;
+  }
 
-    /* Banner */
-    .banner {
-        min-height: 70vh;
-        margin-top: 68px;
-    }
+  /* Forms */
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  .form-container {
+    padding: 30px 20px;
+  }
 
-    .banner-title {
-        font-size: 2.5rem;
-    }
+  /* Footer */
+  .footer-content {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: 30px;
+  }
+  .footer-col h5::after {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .footer-brand {
+    justify-content: center;
+  }
+  .footer-social {
+    justify-content: center;
+  }
+  .footer-bottom {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+  }
+  .footer-col ul li a {
+    justify-content: center;
+  }
+  .footer-contact-item {
+    justify-content: center;
+  }
 
-    .banner-subtitle {
-        font-size: 1rem;
-    }
+  /* Tablas */
+  .data-table {
+    font-size: 0.82rem;
+  }
+  .data-table th,
+  .data-table td {
+    padding: 10px 8px;
+  }
 
-    .banner-welcome {
-        font-size: 1.4rem;
-    }
+  /* Admin tabs */
+  .admin-tabs {
+    flex-wrap: wrap;
+    gap: 4px;
+    border-radius: var(--radius-md);
+  }
+  .admin-tab {
+    padding: 8px 14px;
+    font-size: 0.85rem;
+    flex: 1 0 auto;
+    min-width: max-content;
+  }
+  .admin-panel {
+    padding: 20px 15px;
+  }
 
-    .banner-small {
-        min-height: 35vh;
-    }
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+  }
 
-    .banner-small .banner-title {
-        font-size: 2rem;
-    }
+  /* Mesas */
+  .mesas-grid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  }
+  .tables-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+  }
+  .table-card {
+    padding: 14px;
+  }
+  .table-card__number {
+    font-size: 1.6rem;
+  }
 
-    .banner-buttons {
-        flex-direction: column;
-        align-items: center;
-    }
+  /* Dishes */
+  .dishes-grid {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
 
-    .banner-buttons .btn {
-        width: 100%;
-        max-width: 280px;
-    }
+  /* Tiempos compact */
+  .menu-tiempos-compact {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
 
-    /* Secciones */
-    .section {
-        padding: 40px 0;
-    }
+  /* Auth */
+  .auth-container {
+    margin-top: 68px;
+    padding: 25px 15px;
+  }
+  .auth-body {
+    padding: 25px 20px;
+  }
+  .auth-header {
+    padding: 28px 20px;
+  }
+  .auth-card {
+    max-width: 100%;
+  }
 
-    .section-title {
-        font-size: 1.8rem;
-    }
+  /* Toast */
+  .toast-container {
+    top: 80px;
+    right: 10px;
+    left: 10px;
+  }
+  .toast {
+    min-width: auto;
+    max-width: none;
+  }
 
-    /* Layout */
-    .main-layout {
-        padding: 40px 15px;
-    }
+  /* Ornamento */
+  .ornament::before,
+  .ornament::after {
+    width: 40px;
+  }
 
-    /* Formularios */
-    .form-row {
-        grid-template-columns: 1fr;
-    }
+  /* Calendario */
+  .calendar-panel {
+    padding: 18px;
+  }
+  .cal-day {
+    font-size: 0.8rem;
+  }
+  .cal-legend {
+    font-size: 0.72rem;
+    gap: 10px;
+  }
 
-    .form-container {
-        padding: 30px 20px;
-    }
+  /* Admin menu cards */
+  .menu-admin-card {
+    flex-direction: row;
+    padding: 12px;
+  }
+  .menu-admin-info {
+    min-width: 120px;
+  }
+  .menu-grid-full {
+    grid-template-columns: 1fr;
+  }
 
-    /* Footer */
-    .footer-content {
-        grid-template-columns: 1fr;
-        text-align: center;
-        gap: 30px;
-    }
+  /* Modal */
+  .modal-card {
+    padding: 22px 18px;
+  }
 
-    .footer-col h5::after {
-        left: 50%;
-        transform: translateX(-50%);
-    }
+  /* Filtros reservaciones */
+  .res-filter-row {
+    gap: 8px;
+  }
+  .res-filter-row input,
+  .res-filter-row select {
+    flex: 1;
+    min-width: 110px;
+  }
 
-    .footer-brand {
-        justify-content: center;
-    }
+  /* Mis reservaciones */
+  .my-res-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .my-res-right {
+    flex-direction: row;
+    align-self: stretch;
+    justify-content: space-between;
+    align-items: center;
+  }
 
-    .footer-social {
-        justify-content: center;
-    }
+  /* Filtros mesas admin */
+  .table-area-filters__right {
+    margin-left: 0;
+    width: 100%;
+    justify-content: flex-start;
+  }
+  .mesa-hora-select {
+    min-width: 90px;
+  }
 
-    .footer-bottom {
-        flex-direction: column;
-        gap: 10px;
-        text-align: center;
-    }
+  /* Croquis */
+  .croquis-floor {
+    min-height: 320px;
+  }
+  .croquis .table-card {
+    width: 95px;
+    padding: 8px 6px;
+  }
+  .croquis .table-card .table-card__number {
+    font-size: 1.15rem;
+  }
+  .croquis .table-card .table-card__toggle {
+    font-size: 0.66rem;
+    padding: 3px 6px;
+  }
 
-    /* Tablas */
-    .data-table {
-        font-size: 0.82rem;
-    }
+  /* Menú paper */
+  .menu-paper {
+    padding: 30px 20px;
+  }
+  .menu-paper-header h2 {
+    font-size: 1.6rem;
+  }
+  .menu-paper .menu-items {
+    grid-template-columns: 1fr;
+  }
 
-    .data-table th,
-    .data-table td {
-        padding: 10px 8px;
-    }
-
-    .admin-tabs {
-        flex-wrap: wrap;
-    }
-
-    .admin-tab {
-        padding: 8px 14px;
-        font-size: 0.85rem;
-    }
-
-    .stats-grid {
-        grid-template-columns: 1fr 1fr;
-    }
-
-    .admin-panel {
-        padding: 20px 15px;
-    }
-
-    /* Mesas - ajustar grid */
-    .mesas-grid {
-        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-    }
-
-    /* Dishes */
-    .dishes-grid {
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    }
-
-    /* Auth */
-    .auth-container {
-        margin-top: 68px;
-        padding: 25px 15px;
-    }
-
-    .auth-body {
-        padding: 25px 20px;
-    }
-
-    .auth-header {
-        padding: 28px 20px;
-    }
-
-    /* Toast */
-    .toast-container {
-        top: 80px;
-        right: 10px;
-        left: 10px;
-    }
-
-    .toast {
-        min-width: auto;
-        max-width: none;
-    }
-
-    /* Ornamento */
-    .ornament::before,
-    .ornament::after {
-        width: 40px;
-    }
+  /* Reserva activa */
+  .active-reservation-info {
+    flex-direction: column;
+    text-align: center;
+  }
 }
 
-/* ============================================
-   MÓVIL (480px y menor)
-   ============================================ */
+/* ============================================================
+   6. PHABLET (≤ 600px)
+   ============================================================ */
+@media (max-width: 600px) {
+  .cliente-tab-name {
+    max-width: 90px;
+    font-size: 0.8rem;
+  }
+
+  /* Factura */
+  .invoice {
+    padding: 22px 18px;
+  }
+  .invoice-modal-body {
+    padding: 16px;
+  }
+  .invoice-parties {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 12px 14px;
+  }
+  .invoice-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .invoice-meta {
+    text-align: left;
+  }
+  .invoice-modal-actions .btn {
+    min-width: unset;
+    flex: 1;
+  }
+
+  .area-selector {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ============================================================
+   7. MÓVIL ESTÁNDAR (≤ 480px)
+   ============================================================ */
 @media (max-width: 480px) {
-    html { font-size: 14px; }
+  html {
+    font-size: 14px;
+  }
 
-    h1 { font-size: 1.75rem; }
-    h2 { font-size: 1.5rem; }
-    h3 { font-size: 1.25rem; }
+  h1 {
+    font-size: 1.75rem;
+  }
+  h2 {
+    font-size: 1.5rem;
+  }
+  h3 {
+    font-size: 1.25rem;
+  }
 
-    .container {
-        padding: 0 12px;
-    }
+  .navbar {
+    padding: 10px 12px;
+  }
+  .logo-icon {
+    width: 36px;
+    height: 36px;
+  }
+  .logo-text .brand {
+    font-size: 1rem;
+  }
+  .logo-text .tagline {
+    display: none;
+  }
+  .nav-menu {
+    width: 88%;
+    max-width: 100%;
+  }
+  .user-info {
+    display: none;
+  }
+  .nav-actions .btn {
+    padding: 6px 12px;
+    font-size: 0.75rem;
+  }
 
-    .navbar {
-        padding: 10px 12px;
-    }
+  /* Banner */
+  .banner {
+    min-height: 60vh;
+    margin-top: 62px;
+  }
+  .banner-title {
+    font-size: 2rem;
+  }
+  .banner-subtitle {
+    font-size: 0.9rem;
+  }
+  .banner-welcome {
+    font-size: 1.2rem;
+  }
+  .banner-small {
+    min-height: 28vh;
+  }
+  .banner-small .banner-title {
+    font-size: 1.75rem;
+  }
+  .banner-content {
+    padding: 40px 15px;
+  }
 
-    .logo-icon {
-        width: 36px;
-        height: 36px;
-        font-size: 1.2rem;
-    }
+  /* Secciones */
+  .section {
+    padding: 30px 0;
+  }
+  .section-header {
+    margin-bottom: 30px;
+  }
+  .section-title {
+    font-size: 1.5rem;
+  }
+  .section-tag {
+    font-size: 1.2rem;
+  }
 
-    .logo-text .brand {
-        font-size: 1rem;
-    }
+  /* Botones */
+  .btn {
+    padding: 10px 20px;
+    font-size: 0.85rem;
+  }
+  .btn-lg {
+    padding: 12px 26px;
+    font-size: 0.95rem;
+  }
 
-    .logo-text .tagline {
-        display: none;
-    }
+  /* Layout */
+  .main-layout {
+    padding: 30px 12px;
+    gap: 25px;
+  }
 
-    /* Banner */
-    .banner {
-        min-height: 60vh;
-        margin-top: 62px;
-    }
+  /* Features */
+  .features {
+    grid-template-columns: 1fr;
+  }
+  .feature-card {
+    padding: 25px 18px;
+  }
 
-    .banner-title {
-        font-size: 2rem;
-    }
+  /* Dishes */
+  .dishes-grid {
+    grid-template-columns: 1fr;
+  }
 
-    .banner-subtitle {
-        font-size: 0.9rem;
-    }
+  /* Tiempo cards */
+  .tiempo-card {
+    padding: 25px 18px;
+  }
+  .tiempo-icon {
+    width: 60px;
+    height: 60px;
+    font-size: 1.6rem;
+  }
+  .tiempo-card .tiempo-price {
+    font-size: 1.6rem;
+  }
 
-    .banner-welcome {
-        font-size: 1.2rem;
-    }
+  /* Menú items */
+  .menu-category {
+    padding: 20px 15px;
+  }
+  .menu-items {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .menu-item {
+    padding: 12px;
+  }
 
-    .banner-small {
-        min-height: 28vh;
-    }
+  /* Tabs menú */
+  .menu-schedule-tabs {
+    gap: 5px;
+  }
+  .menu-tab-btn {
+    font-size: 0.78rem;
+    padding: 8px 14px;
+  }
 
-    .banner-small .banner-title {
-        font-size: 1.75rem;
-    }
+  /* Area selector */
+  .area-selector {
+    grid-template-columns: 1fr 1fr;
+  }
+  .area-option {
+    padding: 15px 10px;
+  }
+  .area-option i {
+    font-size: 1.6rem;
+  }
 
-    .banner-content {
-        padding: 40px 15px;
-    }
+  /* Mesas */
+  .mesas-grid {
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    gap: 8px;
+    padding: 15px 10px;
+  }
+  .mesa {
+    font-size: 0.75rem;
+  }
+  .mesa i {
+    font-size: 1rem;
+  }
 
-    /* Section */
-    .section {
-        padding: 30px 0;
-    }
+  /* Tablas scroll */
+  .table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .data-table {
+    min-width: 500px;
+    font-size: 0.8rem;
+  }
 
-    .section-header {
-        margin-bottom: 30px;
-    }
+  /* Admin stats */
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  .stat-card {
+    padding: 20px 18px;
+  }
+  .stat-number {
+    font-size: 2rem;
+  }
 
-    .section-title {
-        font-size: 1.5rem;
-    }
+  /* Admin tabs */
+  .admin-tabs {
+    padding: 6px;
+    gap: 3px;
+  }
+  .admin-tab {
+    font-size: 0.78rem;
+    padding: 7px 10px;
+  }
 
-    .section-tag {
-        font-size: 1.2rem;
-    }
+  /* Forms */
+  .form-container {
+    padding: 25px 18px;
+  }
 
-    /* Botones */
-    .btn {
-        padding: 10px 20px;
-        font-size: 0.85rem;
-    }
+  /* Auth */
+  .auth-header {
+    padding: 24px 18px;
+  }
+  .auth-header .logo-icon {
+    width: 60px;
+    height: 60px;
+  }
+  .auth-header h2 {
+    font-size: 1.5rem;
+  }
+  .auth-body {
+    padding: 22px 18px;
+  }
 
-    .btn-lg {
-        padding: 12px 26px;
-        font-size: 0.95rem;
-    }
+  /* Footer */
+  .footer {
+    padding: 40px 15px 15px;
+  }
+  .footer-col h5 {
+    font-size: 1rem;
+  }
 
-    /* Layout */
-    .main-layout {
-        padding: 30px 12px;
-        gap: 25px;
-    }
+  /* Aside */
+  .aside-widget {
+    padding: 18px;
+  }
 
-    /* Features */
-    .features {
-        grid-template-columns: 1fr;
-    }
+  /* Mesa legend */
+  .mesa-legend {
+    gap: 12px;
+    font-size: 0.78rem;
+  }
 
-    .feature-card {
-        padding: 25px 18px;
-    }
+  /* Calendario */
+  .cal-day {
+    font-size: 0.75rem;
+    border-width: 1.5px;
+  }
+  .cal-day-header {
+    font-size: 0.6rem;
+  }
+  .cal-grid {
+    gap: 2px;
+  }
+  .cal-legend {
+    font-size: 0.68rem;
+    gap: 8px;
+  }
+  .calendar-panel {
+    padding: 14px;
+  }
+  .cal-header h3 {
+    font-size: 1.05rem;
+  }
 
-    /* Dishes */
-    .dishes-grid {
-        grid-template-columns: 1fr;
-    }
+  /* Tables admin */
+  .tables-grid {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 8px;
+  }
 
-    /* Menú tiempos */
-    .tiempo-card {
-        padding: 25px 18px;
-    }
+  /* Admin menu cards */
+  .menu-admin-card {
+    gap: 10px;
+  }
+  .menu-admin-icon {
+    font-size: 1.5rem;
+  }
+  .menu-admin-actions {
+    gap: 5px;
+  }
 
-    .tiempo-icon {
-        width: 60px;
-        height: 60px;
-        font-size: 1.6rem;
-    }
+  /* Modal */
+  .modal-card {
+    padding: 18px 14px;
+  }
+  .modal-card h3 {
+    font-size: 1.3rem;
+  }
 
-    .tiempo-card .tiempo-price {
-        font-size: 1.6rem;
-    }
+  .filter-btn {
+    font-size: 0.72rem;
+    padding: 6px 12px;
+  }
 
-    /* Menú items */
-    .menu-category {
-        padding: 20px 15px;
-    }
+  /* Croquis */
+  .croquis-floor {
+    min-height: 280px;
+  }
+  .croquis .table-card {
+    width: 78px;
+    padding: 6px 4px;
+  }
+  .croquis .table-card .table-card__number {
+    font-size: 1rem;
+  }
+  .croquis .table-card .table-card__number::before {
+    font-size: 0.6rem;
+  }
+  .croquis .table-card .table-card__cap {
+    font-size: 0.62rem;
+    margin-bottom: 3px;
+  }
+  .croquis .table-card .table-card__toggle {
+    font-size: 0.58rem;
+    padding: 2px 4px;
+  }
+  .feature-label {
+    font-size: 0.75rem;
+  }
+  .feature-palm .feature-emoji {
+    font-size: 2.8rem;
+  }
+  .feature-dance-floor {
+    width: 110px;
+    height: 110px;
+  }
+  .dance-emoji {
+    font-size: 2.2rem;
+  }
+  .fire-emoji {
+    font-size: 2.4rem;
+  }
+  .feature-plant,
+  .feature-lantern,
+  .feature-offering {
+    font-size: 1.4rem;
+  }
 
-    .menu-items {
-        grid-template-columns: 1fr;
-        gap: 12px;
-    }
+  /* Menú paper */
+  .menu-paper {
+    padding: 24px 14px;
+  }
+  .menu-paper-header h2 {
+    font-size: 1.4rem;
+  }
 
-    .menu-item {
-        padding: 12px;
-    }
+  /* Resumen reserva */
+  .reservation-summary {
+    padding: 18px 15px;
+  }
 
-    /* Área selector */
-    .area-selector {
-        grid-template-columns: 1fr 1fr;
-    }
+  /* Filtros area mesas */
+  .table-area-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .table-area-filters__left,
+  .table-area-filters__right {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
 
-    .area-option {
-        padding: 15px 10px;
-    }
+  /* Pedidos admin */
+  .pedido-reserva-header {
+    flex-direction: column;
+    gap: 10px;
+  }
 
-    .area-option i {
-        font-size: 1.6rem;
-    }
+  /* Mis reservas */
+  .my-res-right {
+    gap: 8px;
+  }
 
-    /* Mesas grid */
-    .mesas-grid {
-        grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
-        gap: 8px;
-        padding: 15px 10px;
-    }
+  /* Factura modal */
+  .invoice-modal-topbar {
+    padding: 12px 16px;
+  }
+  .invoice-modal-topbar h3 {
+    font-size: 0.95rem;
+  }
 
-    .mesa {
-        font-size: 0.75rem;
-    }
+  /* Social login */
+  .social-btn {
+    font-size: 12.5px;
+    padding: 9px 12px;
+  }
 
-    .mesa i {
-        font-size: 1rem;
-    }
-
-    /* Tabla scroll horizontal */
-    .table-wrapper {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .data-table {
-        min-width: 500px;
-    }
-
-    .stats-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .stat-card {
-        padding: 20px 18px;
-    }
-
-    .stat-number {
-        font-size: 2rem;
-    }
-
-    /* Form */
-    .form-container {
-        padding: 25px 18px;
-    }
-
-    /* Auth */
-    .auth-header {
-        padding: 24px 18px;
-    }
-
-    .auth-header .logo-icon {
-        width: 60px;
-        height: 60px;
-    }
-
-    .auth-header h2 {
-        font-size: 1.5rem;
-    }
-
-    .auth-body {
-        padding: 22px 18px;
-    }
-
-    /* Footer */
-    .footer {
-        padding: 40px 15px 15px;
-    }
-
-    .footer-col h5 {
-        font-size: 1rem;
-    }
-
-    /* Aside widget */
-    .aside-widget {
-        padding: 18px;
-    }
-
-    /* Mesa legend */
-    .mesa-legend {
-        gap: 12px;
-        font-size: 0.78rem;
-    }
-
-    /* Nav actions */
-    .user-info {
-        display: none;
-    }
-
-    .nav-actions .btn {
-        padding: 6px 12px;
-        font-size: 0.75rem;
-    }
+  /* Tiempo compact */
+  .tiempo-card-compact {
+    padding: 16px 12px;
+  }
+  .tiempo-card-compact .tc-price {
+    font-size: 1.3rem;
+  }
 }
 
-/* ============================================
-   MÓVIL EXTRA PEQUEÑO (360px)
-   ============================================ */
+/* ============================================================
+   8. MÓVIL EXTRA PEQUEÑO (≤ 360px)
+   ============================================================ */
 @media (max-width: 360px) {
-    .banner-title {
-        font-size: 1.7rem;
-    }
-
-    .logo-text {
-        display: none;
-    }
-
-    .mesas-grid {
-        grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
-    }
+  .banner-title {
+    font-size: 1.7rem;
+  }
+  .logo-text {
+    display: none;
+  }
+  .mesas-grid {
+    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+  }
+  .croquis .table-card {
+    width: 65px;
+  }
+  .admin-tab {
+    font-size: 0.72rem;
+    padding: 6px 8px;
+  }
+  .main-aside {
+    grid-template-columns: 1fr;
+  }
+  .section-title {
+    font-size: 1.3rem;
+  }
+  .banner-small .banner-title {
+    font-size: 1.5rem;
+  }
 }
 
-/* ==========================================================
-   RESPONSIVE - Calendario, tables-grid, menu-cards, admin
-   ========================================================== */
-@media (max-width: 756px) {
-    .calendar-panel { padding: 18px; }
-    .cal-day { font-size: 0.8rem; }
-    .cal-legend { font-size: 0.72rem; gap: 10px; }
-
-    .tables-grid {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        gap: 10px;
-    }
-    .table-card { padding: 14px; }
-    .table-card__number { font-size: 1.6rem; }
-
-    .menu-admin-card {
-        flex-direction: row;
-        padding: 12px;
-    }
-    .menu-admin-info {
-        min-width: 120px;
-    }
-
-    .menu-grid-full {
-        grid-template-columns: 1fr;
-    }
-
-    .modal-card {
-        padding: 22px 18px;
-    }
-
-    .res-filter-row {
-        gap: 8px;
-    }
-    .res-filter-row input,
-    .res-filter-row select {
-        flex: 1;
-        min-width: 110px;
-    }
-
-    .my-res-card {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    .my-res-right {
-        flex-direction: row;
-        align-self: stretch;
-        justify-content: space-between;
-        align-items: center;
-    }
-}
-
-@media (max-width: 480px) {
-    .cal-day { font-size: 0.75rem; border-width: 1.5px; }
-    .cal-day-header { font-size: 0.6rem; }
-    .cal-grid { gap: 2px; }
-    .cal-legend { font-size: 0.68rem; gap: 8px; }
-
-    .calendar-panel { padding: 14px; }
-    .cal-header h3 { font-size: 1.05rem; }
-
-    .tables-grid {
-        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-        gap: 8px;
-    }
-
-    .menu-tab-btn {
-        font-size: 0.78rem;
-        padding: 8px 14px;
-    }
-
-    .menu-admin-card {
-        gap: 10px;
-    }
-    .menu-admin-icon {
-        font-size: 1.5rem;
-    }
-    .menu-admin-actions {
-        gap: 5px;
-    }
-
-    .modal-card {
-        padding: 18px 14px;
-    }
-    .modal-card h3 {
-        font-size: 1.3rem;
-    }
-
-    .filter-btn {
-        font-size: 0.72rem;
-        padding: 6px 12px;
-    }
+/* ============================================================
+   9. PRINT — factura imprimible
+   ============================================================ */
+@media print {
+  .header,
+  .footer,
+  .main-aside,
+  .admin-tabs,
+  .invoice-modal-actions,
+  .invoice-modal-topbar,
+  .toast-container {
+    display: none !important;
+  }
+  .invoice-modal-body {
+    overflow: visible;
+    padding: 0;
+  }
+  .invoice {
+    box-shadow: none;
+    padding: 20px;
+  }
+  body {
+    background: white;
+    color: black;
+  }
 }

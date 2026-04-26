@@ -35,14 +35,18 @@
    forma transparente.
    =================================================== */
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-analytics.js";
 import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  GoogleAuthProvider,
+  FacebookAuthProvider,
+  signInWithPopup,
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
 import {
   getFirestore,
   collection,
@@ -59,7 +63,7 @@ import {
   onSnapshot,
   serverTimestamp,
   Timestamp,
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
 // ============================================================
 // ⚠️ REEMPLAZA ESTAS CREDENCIALES CON LAS DE TU PROYECTO FIREBASE
@@ -79,9 +83,10 @@ const firebaseConfig = {
 // si las credenciales están vacías no se realizan peticiones
 // reales porque USE_DEMO_MODE intercepta los flujos).
 // ============================================================
-let app, auth, db;
+/* let app, auth, db, analytics;
 try {
   app = initializeApp(firebaseConfig);
+  analytics = getAnalytics(app);
   auth = getAuth(app);
   db = getFirestore(app);
 } catch (err) {
@@ -90,9 +95,15 @@ try {
     err?.message || err,
   );
   app = null;
+  analytics = null;
   auth = null;
   db = null;
-}
+} */
+
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
 // ============================================================
 // BANDERA DE MODO DEMO
@@ -159,6 +170,9 @@ export {
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
+  GoogleAuthProvider,
+  FacebookAuthProvider,
+  signInWithPopup,
   // Firestore functions
   collection,
   doc,

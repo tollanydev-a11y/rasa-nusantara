@@ -18,11 +18,7 @@
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="css/responsive.css" />
 
-    <link
-      rel="icon"
-      type="image/svg+xml"
-      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23C1272D'/%3E%3Ctext x='50' y='68' text-anchor='middle' font-size='58'%3E🍜%3C/text%3E%3C/svg%3E"
-    />
+    <link rel="icon" type="image/svg+xml" href="img/logo.png" />
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   </head>
   <body>
@@ -30,7 +26,9 @@
     <header class="header" id="header">
       <nav class="navbar">
         <a href="index.html" class="logo">
-          <div class="logo-icon">🍜</div>
+          <div class="logo-icon">
+            <img src="img/logo.png" alt="Rasa Nusantara" />
+          </div>
           <div class="logo-text">
             <span class="brand">RASA NUSANTARA</span>
             <span class="tagline">Panel de Administración</span>
@@ -189,22 +187,6 @@
         </div>
 
         <div class="aside-widget">
-          <h4><i class="fa-solid fa-database"></i> Firebase</h4>
-          <p
-            style="
-              font-size: 0.85rem;
-              color: var(--color-text-light);
-              line-height: 1.7;
-            "
-          >
-            El sistema opera actualmente en <strong>modo demo</strong>. Para
-            activar la persistencia en la nube, edita
-            <code>js/firebase-config.js</code>
-            con tus credenciales.
-          </p>
-        </div>
-
-        <div class="aside-widget">
           <h4><i class="fa-solid fa-circle-question"></i> Soporte</h4>
           <div class="aside-contact">
             <div class="aside-contact-item">
@@ -225,15 +207,25 @@
       <div class="footer-content">
         <div class="footer-col">
           <div class="footer-brand">
-            <div class="logo-icon">🍜</div>
+            <div class="logo-icon">
+              <img src="img/logo.png" alt="Rasa Nusantara" />
+            </div>
             <span class="footer-brand-text">RASA NUSANTARA</span>
           </div>
           <p>Auténtica gastronomía indonesia en CDMX.</p>
           <div class="footer-social">
-            <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
-            <a href="#"><i class="fa-brands fa-instagram"></i></a>
-            <a href="#"><i class="fa-brands fa-twitter"></i></a>
-            <a href="#"><i class="fa-brands fa-whatsapp"></i></a>
+            <a href="https://www.facebook.com" target="_blank"
+              ><i class="fa-brands fa-facebook-f"></i
+            ></a>
+            <a href="https://www.instagram.com" target="_blank"
+              ><i class="fa-brands fa-instagram"></i
+            ></a>
+            <a href="https://x.com" target="_blank"
+              ><i class="fa-brands fa-twitter"></i
+            ></a>
+            <a href="https://www.whatsapp.com" target="_blank"
+              ><i class="fa-brands fa-whatsapp"></i
+            ></a>
           </div>
         </div>
         <div class="footer-col">
@@ -243,14 +235,6 @@
             <li><a href="menu.html">Menú</a></li>
             <li><a href="reservaciones.html">Reservaciones</a></li>
             <li><a href="admin.html">Admin</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h5>Admin</h5>
-          <ul>
-            <li><a href="#">Documentación</a></li>
-            <li><a href="#">Firebase Console</a></li>
-            <li><a href="#">API</a></li>
           </ul>
         </div>
         <div class="footer-col">

@@ -10,109 +10,111 @@
      platillo.
    =================================================== */
 
-import { updateNavUI, logoutUser } from './auth.js';
+import { updateNavUI, logoutUser } from "./auth.js";
 
 // ==========================================================
 // INICIALIZACIÓN AL CARGAR LA PÁGINA
 // ==========================================================
-document.addEventListener('DOMContentLoaded', () => {
-    initHeader();
-    initMobileMenu();
-    initLogout();
-    updateNavUI();
-    markActiveNavLink();
+document.addEventListener("DOMContentLoaded", () => {
+  initHeader();
+  initMobileMenu();
+  initLogout();
+  updateNavUI();
+  markActiveNavLink();
 });
 
 // ==========================================================
 // HEADER: Efecto de scroll
 // ==========================================================
 function initHeader() {
-    const header = document.getElementById('header');
-    if (!header) return;
+  const header = document.getElementById("header");
+  if (!header) return;
 
-    window.addEventListener('scroll', () => {
-        if (window.pageYOffset > 50) {
-            header.classList.add('scrolled');
-        } else {
-            header.classList.remove('scrolled');
-        }
-    });
+  window.addEventListener("scroll", () => {
+    if (window.pageYOffset > 50) {
+      header.classList.add("scrolled");
+    } else {
+      header.classList.remove("scrolled");
+    }
+  });
 }
 
 // ==========================================================
 // MENÚ HAMBURGUESA RESPONSIVE
 // ==========================================================
 function initMobileMenu() {
-    const hamburger = document.getElementById('hamburger');
-    const navMenu = document.getElementById('nav-menu');
+  const hamburger = document.getElementById("hamburger");
+  const navMenu = document.getElementById("nav-menu");
 
-    if (!hamburger || !navMenu) return;
+  if (!hamburger || !navMenu) return;
 
-    const overlay = document.createElement('div');
-    overlay.className = 'menu-overlay';
-    document.body.appendChild(overlay);
+  const overlay = document.createElement("div");
+  overlay.className = "menu-overlay";
+  document.body.appendChild(overlay);
 
-    const toggleMenu = () => {
-        hamburger.classList.toggle('active');
-        navMenu.classList.toggle('active');
-        overlay.classList.toggle('active');
-        document.body.style.overflow = navMenu.classList.contains('active') ? 'hidden' : '';
-    };
+  const toggleMenu = () => {
+    hamburger.classList.toggle("active");
+    navMenu.classList.toggle("active");
+    overlay.classList.toggle("active");
+    document.body.style.overflow = navMenu.classList.contains("active")
+      ? "hidden"
+      : "";
+  };
 
-    const closeMenu = () => {
-        hamburger.classList.remove('active');
-        navMenu.classList.remove('active');
-        overlay.classList.remove('active');
-        document.body.style.overflow = '';
-    };
+  const closeMenu = () => {
+    hamburger.classList.remove("active");
+    navMenu.classList.remove("active");
+    overlay.classList.remove("active");
+    document.body.style.overflow = "";
+  };
 
-    hamburger.addEventListener('click', toggleMenu);
-    overlay.addEventListener('click', closeMenu);
+  hamburger.addEventListener("click", toggleMenu);
+  overlay.addEventListener("click", closeMenu);
 
-    navMenu.querySelectorAll('a').forEach(link => {
-        link.addEventListener('click', closeMenu);
-    });
+  navMenu.querySelectorAll("a").forEach((link) => {
+    link.addEventListener("click", closeMenu);
+  });
 
-    window.addEventListener('resize', () => {
-        if (window.innerWidth > 992) closeMenu();
-    });
+  window.addEventListener("resize", () => {
+    if (window.innerWidth > 1135) closeMenu();
+  });
 }
 
 // ==========================================================
 // LOGOUT
 // ==========================================================
 function initLogout() {
-    const logoutBtn = document.getElementById('logout-btn');
-    if (!logoutBtn) return;
+  const logoutBtn = document.getElementById("logout-btn");
+  if (!logoutBtn) return;
 
-    logoutBtn.addEventListener('click', async (e) => {
-        e.preventDefault();
+  logoutBtn.addEventListener("click", async (e) => {
+    e.preventDefault();
 
-        if (confirm('¿Deseas cerrar sesión?')) {
-            const result = await logoutUser();
-            if (result.success) {
-                showToast('Sesión cerrada correctamente', 'success');
-                setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 800);
-            }
-        }
-    });
+    if (confirm("¿Deseas cerrar sesión?")) {
+      const result = await logoutUser();
+      if (result.success) {
+        showToast("Sesión cerrada correctamente", "success");
+        setTimeout(() => {
+          window.location.href = "index.html";
+        }, 800);
+      }
+    }
+  });
 }
 
 // ==========================================================
 // MARCAR ENLACE ACTIVO EN EL MENÚ
 // ==========================================================
 function markActiveNavLink() {
-    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-    const navLinks = document.querySelectorAll('.nav-menu a');
+  const currentPage = window.location.pathname.split("/").pop() || "index.html";
+  const navLinks = document.querySelectorAll(".nav-menu a");
 
-    navLinks.forEach(link => {
-        const href = link.getAttribute('href');
-        if (href === currentPage || (currentPage === '' && href === 'index.html')) {
-            link.classList.add('active');
-        }
-    });
+  navLinks.forEach((link) => {
+    const href = link.getAttribute("href");
+    if (href === currentPage || (currentPage === "" && href === "index.html")) {
+      link.classList.add("active");
+    }
+  });
 }
 
 // ==========================================================
@@ -125,35 +127,35 @@ function markActiveNavLink() {
  * @param {string} type - success | error | warning | info
  * @param {number} duration - Duración en ms (default 3000)
  */
-export function showToast(message, type = 'info', duration = 3000) {
-    let container = document.querySelector('.toast-container');
-    if (!container) {
-        container = document.createElement('div');
-        container.className = 'toast-container';
-        document.body.appendChild(container);
-    }
+export function showToast(message, type = "info", duration = 3000) {
+  let container = document.querySelector(".toast-container");
+  if (!container) {
+    container = document.createElement("div");
+    container.className = "toast-container";
+    document.body.appendChild(container);
+  }
 
-    const icons = {
-        success: 'fa-circle-check',
-        error: 'fa-circle-xmark',
-        warning: 'fa-triangle-exclamation',
-        info: 'fa-circle-info'
-    };
+  const icons = {
+    success: "fa-circle-check",
+    error: "fa-circle-xmark",
+    warning: "fa-triangle-exclamation",
+    info: "fa-circle-info",
+  };
 
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    toast.innerHTML = `
+  const toast = document.createElement("div");
+  toast.className = `toast ${type}`;
+  toast.innerHTML = `
         <i class="fa-solid ${icons[type] || icons.info}"></i>
         <span>${message}</span>
     `;
 
-    container.appendChild(toast);
+  container.appendChild(toast);
 
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateX(100%)';
-        setTimeout(() => toast.remove(), 300);
-    }, duration);
+  setTimeout(() => {
+    toast.style.opacity = "0";
+    toast.style.transform = "translateX(100%)";
+    setTimeout(() => toast.remove(), 300);
+  }, duration);
 }
 
 // Hacer showToast disponible globalmente
@@ -167,36 +169,36 @@ window.showToast = showToast;
  * Formatea un número como moneda (MXN)
  */
 export function formatCurrency(amount) {
-    return new Intl.NumberFormat('es-MX', {
-        style: 'currency',
-        currency: 'MXN',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0
-    }).format(amount);
+  return new Intl.NumberFormat("es-MX", {
+    style: "currency",
+    currency: "MXN",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount);
 }
 
 /**
  * Formatea una fecha ISO a formato legible en español
  */
 export function formatDate(dateStr) {
-    const date = new Date(dateStr + 'T00:00:00');
-    return date.toLocaleDateString('es-MX', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
+  const date = new Date(dateStr + "T00:00:00");
+  return date.toLocaleDateString("es-MX", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 }
 
 /**
  * Devuelve la fecha de hoy en formato YYYY-MM-DD
  */
 export function getTodayISO() {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 // ==========================================================
@@ -208,11 +210,13 @@ export function getTodayISO() {
  * en la UI (compartido por admin, reservaciones y mis-reservaciones).
  */
 export function traducirEstado(estado) {
-    return {
-        confirmed: 'Confirmada',
-        pending: 'Pendiente',
-        cancelled: 'Cancelada'
-    }[estado] || estado;
+  return (
+    {
+      confirmed: "Confirmada",
+      pending: "Pendiente",
+      cancelled: "Cancelada",
+    }[estado] || estado
+  );
 }
 
 /**
@@ -220,10 +224,10 @@ export function traducirEstado(estado) {
  * chiles + etiqueta. Se usa tanto en el home como en la carta.
  */
 export function renderSpicyLevel(level) {
-    if (!level || level === 0) return '';
-    const peppers = '🌶️'.repeat(level);
-    const etiquetas = ['', 'Suave', 'Medio', 'Picante', 'Muy picante'];
-    return `
+  if (!level || level === 0) return "";
+  const peppers = "🌶️".repeat(level);
+  const etiquetas = ["", "Suave", "Medio", "Picante", "Muy picante"];
+  return `
         <span class="spicy-level spicy-level--${level}">
             <span class="spicy-level-peppers">${peppers}</span>
             <span class="spicy-level-text">${etiquetas[level]}</span>
@@ -242,13 +246,20 @@ export function renderSpicyLevel(level) {
  * @param {string} [wrapperClass='menu-item-image'] - Clase base del contenedor
  * @returns {string} HTML del bloque de imagen
  */
-export function renderPlatilloImage(platillo, wrapperClass = 'menu-item-image') {
-    const emoji = platillo.emoji || '🍽';
-    const safeEmoji = emoji.replace(/"/g, '&quot;');
+export function renderPlatilloImage(
+  platillo,
+  wrapperClass = "menu-item-image",
+) {
+  const emoji = platillo.emoji || "🍽";
+  const safeEmoji = emoji.replace(/"/g, "&quot;");
 
-    // 1) Imagen real (URL http/https o data:)
-    if (platillo.imagen && typeof platillo.imagen === 'string' && platillo.imagen.trim()) {
-        return `
+  // 1) Imagen real (URL http/https o data:)
+  if (
+    platillo.imagen &&
+    typeof platillo.imagen === "string" &&
+    platillo.imagen.trim()
+  ) {
+    return `
             <div class="${wrapperClass}">
                 <img src="${platillo.imagen}"
                      alt="${platillo.nombre}"
@@ -256,19 +267,19 @@ export function renderPlatilloImage(platillo, wrapperClass = 'menu-item-image') 
                      onerror="this.parentElement.classList.add('${wrapperClass}--placeholder'); this.outerHTML='&lt;span class=&quot;menu-item-emoji&quot;&gt;${safeEmoji}&lt;/span&gt;';">
             </div>
         `;
-    }
+  }
 
-    // 2) Ícono FontAwesome (solo si no hay emoji definido)
-    if (platillo.icono && platillo.icono.trim() && !platillo.emoji) {
-        return `
+  // 2) Ícono FontAwesome (solo si no hay emoji definido)
+  if (platillo.icono && platillo.icono.trim() && !platillo.emoji) {
+    return `
             <div class="${wrapperClass} ${wrapperClass}--placeholder">
                 <i class="fa-solid ${platillo.icono} menu-item-faicon"></i>
             </div>
         `;
-    }
+  }
 
-    // 3) Fallback: emoji grande en gradient
-    return `
+  // 3) Fallback: emoji grande en gradient
+  return `
         <div class="${wrapperClass} ${wrapperClass}--placeholder">
             <span class="menu-item-emoji">${emoji}</span>
         </div>

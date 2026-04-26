@@ -5,6 +5,18 @@
 
 /* ---------- VARIABLES CSS (Paleta Indonesia) ---------- */
 :root {
+  /* ── Aliases del tema indonesio (compatibilidad componentes) ── */
+  --brand-bg:        linear-gradient(135deg, #1a1110 0%, #3e2723 100%);
+  --brand-accent:    #d4af37;   /* → dorado templo          */
+  --brand-accent-dark: #8b0000; /* → rojo profundo          */
+  --panel-bg:        #faf3e7;   /* → crema arroz            */
+  --text-primary:    #2c2421;   /* → color-text             */
+  --text-secondary:  #6b5d54;   /* → color-text-light       */
+  --text-muted:      #a08060;   /* marrón especia atenuado  */
+  --border:          #e8dcc4;   /* → color-border (cálido)  */
+  --input-bg:        #faf3e7;   /* → crema arroz            */
+  --font-serif:      "Playfair Display", Georgia, serif;
+  --font-sans:       "Poppins", system-ui, sans-serif;
   /* Colores principales inspirados en Indonesia */
   --color-primary: #c1272d; /* Rojo batik / bandera */
   --color-primary-dark: #8b0000; /* Rojo profundo */
@@ -235,6 +247,28 @@ button {
   align-items: center;
   justify-content: center;
   font-size: 1.5rem;
+  overflow: hidden; /* recorta la imagen al círculo */
+  flex-shrink: 0; /* no se deforma en flex containers */
+}
+
+/* Imagen dentro del logo (PNG / SVG / etc.) */
+.logo-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* llena el círculo; usar 'contain' si el PNG ya viene con su propio diseño */
+  display: block;
+}
+
+/* Variante: logo sin el círculo dorado de fondo
+   (útil si tu PNG ya trae su propio fondo / diseño completo).
+   Uso: <div class="logo-icon logo-icon--bare"><img ...></div> */
+.logo-icon--bare {
+  background: transparent;
+  border-radius: 0;
+  overflow: visible;
+}
+.logo-icon--bare img {
+  object-fit: contain;
 }
 
 .logo-text {
@@ -460,13 +494,12 @@ button {
    LAYOUT: SECTION + ASIDE
    =================================================== */
 .main-layout {
-  width: 90%;
   display: grid;
   grid-template-columns: 1fr 320px;
   gap: 40px;
   padding: 60px 20px;
   width: 90%;
-  /* max-width: 1400px; */
+  max-width: 1400px;
   margin: 0 auto;
   flex: 1;
   box-sizing: border-box;
@@ -3228,7 +3261,7 @@ button {
    BOTÓN ADMIN "Habilitar selección de platillos"
    =================================================== */
 .btn-habilitar-menu {
-  background: linear-gradient(135deg, #7b1fa2 0%, #4a148c 100%);
+  background: linear-gradient(135deg, var(--color-accent) 0%, #1b4d1e 100%);
   color: var(--color-light);
   border: none;
   padding: 6px 14px;
@@ -3249,7 +3282,7 @@ button {
 }
 
 .btn-habilitar-menu.active {
-  background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
 }
 
 .btn-habilitar-menu:disabled {
@@ -5242,4 +5275,82 @@ body.modal-open {
 
 .extras-warning-banner strong {
   color: var(--color-primary);
+}
+
+/* ── Divisor ── */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--color-text-light);
+  font-size: 12px;
+  font-family: var(--font-body);
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
+}
+
+/* ── Botones de acceso social ── */
+.social-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.social-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  width: 100%;
+  padding: 11px 16px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-light);
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, transform 0.1s;
+}
+
+.social-btn:hover {
+  border-color: var(--color-secondary);
+  background: var(--color-cream);
+}
+
+.social-btn:active {
+  transform: scale(0.985);
+}
+
+.social-btn.github {
+  background: var(--color-dark-deep);
+  border-color: var(--color-dark-deep);
+  color: var(--color-secondary);
+}
+
+.social-btn.github img {
+  filter: invert(1);
+}
+
+.social-btn.github:hover {
+  background: var(--color-dark);
+  border-color: var(--color-secondary);
+}
+
+.social-btn.facebook {
+  background: #1877f2;
+  border-color: #1877f2;
+  color: white;
+}
+
+.social-btn.facebook:hover {
+  background: #1565d8;
+  border-color: #1565d8;
 }
