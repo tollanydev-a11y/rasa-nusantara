@@ -1311,29 +1311,64 @@ function renderPedidosTab() {
 
         // Agrupa los IDs de una categoría y renderiza una card por platillo único
         const renderCategoria = (ids, categoria) => {
+          const esAlaCarta = menu?.id === "alacarta";
+          const maxSel = menu ? menu.maxSelecciones : {};
+          const limite = esAlaCarta ? 0 : maxSel[categoria] || 0;
+
+          // Conservar posición original para detectar extras
           const grupos = new Map();
-          ids.forEach((id) => grupos.set(id, (grupos.get(id) || 0) + 1));
+          ids.forEach((id, pos) => {
+            if (!grupos.has(id)) grupos.set(id, { qty: 0, posiciones: [] });
+            const g = grupos.get(id);
+            g.qty++;
+            g.posiciones.push(pos);
+          });
 
           return Array.from(grupos.entries())
-            .map(([platilloId, qty]) => {
+            .map(([platilloId, { qty, posiciones }]) => {
               const p = platillos.find((x) => x.id === platilloId);
               if (!p) return "";
+
+              // Cuántas ocurrencias caen fuera del límite → son extras
+              const extraCount = esAlaCarta
+                ? qty
+                : posiciones.filter((pos) => pos >= limite).length;
+              const incluidoCount = qty - extraCount;
 
               const qtyBadge =
                 qty > 1
                   ? `<span class="menu-admin-qty-badge">×${qty}</span>`
                   : "";
 
-              const precioLabel =
-                qty > 1
-                  ? `${qty}×${formatCurrency(p.precio)} = ${formatCurrency(p.precio * qty)}`
-                  : formatCurrency(p.precio);
+              const extraBadge =
+                extraCount > 0
+                  ? `<span class="menu-admin-extra-badge">+${extraCount > 1 ? extraCount + " " : ""}EXTRA</span>`
+                  : "";
+
+              // Etiqueta de precio: incluidos + extras desglosados
+              let precioLabel;
+              if (esAlaCarta) {
+                precioLabel =
+                  qty > 1
+                    ? `${qty}×${formatCurrency(p.precio)} = ${formatCurrency(p.precio * qty)}`
+                    : formatCurrency(p.precio);
+              } else if (incluidoCount > 0 && extraCount === 0) {
+                precioLabel = `<span style="color:#4CAF50;font-style:italic;">Incluido${qty > 1 ? " ×" + qty : ""}</span>`;
+              } else if (incluidoCount === 0) {
+                precioLabel =
+                  extraCount > 1
+                    ? `${extraCount}×${formatCurrency(p.precio)} = ${formatCurrency(p.precio * extraCount)}`
+                    : formatCurrency(p.precio);
+              } else {
+                // Mixto
+                precioLabel = `<span style="color:#4CAF50;font-style:italic;">×${incluidoCount}&nbsp;Incl.</span> + ${formatCurrency(p.precio * extraCount)}`;
+              }
 
               return `
               <div class="menu-admin-card">
                 ${renderAdminDishThumb(p)}
                 <div class="menu-admin-info">
-                  <strong>${p.nombre}${qtyBadge}</strong>
+                  <strong>${p.nombre}${qtyBadge}${extraBadge}</strong>
                   <span class="origin">${p.origen}</span>
                   <span class="meta">${precioLabel} · ${categoria}</span>
                 </div>

@@ -105,7 +105,7 @@ function render() {
                     <strong>${formatDate(r.fecha)}</strong>
                     <span>
                         <i class="fa-solid fa-clock"></i> ${r.hora} ·
-                        <i class="fa-solid fa-users"></i> ${r.personas} pax ·
+                        <i class="fa-solid fa-users"></i> ${r.personas} pars ·
                         ${area ? area.nombre : r.area} · Mesa #${r.mesa.split("-m")[1]}
                     </span>
                     <span style="margin-top:2px;">
@@ -222,9 +222,11 @@ function construirHTMLFactura(reserva) {
   const maxSel = menu
     ? menu.maxSelecciones
     : { entradas: 0, principales: 0, postres: 0, bebidas: 0 };
+
   let subtotalExtras = 0;
   let subtotalAlaCarta = 0;
   let filasHTML = "";
+  let hayPlatillos = false;
 
   (reserva.menuSelectionsByClient || []).forEach((sel, idx) => {
     const nombre =
@@ -232,17 +234,20 @@ function construirHTMLFactura(reserva) {
     const cats = ["entradas", "principales", "postres", "bebidas"];
     const totalPlatillos = cats.reduce((s, c) => s + (sel[c] || []).length, 0);
     if (totalPlatillos === 0) return;
+    hayPlatillos = true;
 
-    filasHTML += `<tr><td colspan="3" style="background:#FFF8ED;color:#C1272D;font-size:0.82rem;font-weight:700;
-             border-top:2px solid #D4AF37;padding:8px 12px;">
-          ${idx + 1}. ${nombre} <span style="color:#8B5A2B;font-weight:400;margin-left:8px;">(${totalPlatillos} platillos)</span>
-        </td></tr>`;
+    filasHTML += `<tr class="inv-row-cliente">
+            <td colspan="3">
+                <span class="inv-cliente-num">${idx + 1}</span>
+                <span class="inv-cliente-nombre">${nombre}</span>
+                <span class="inv-cliente-count">(${totalPlatillos} platillo${totalPlatillos > 1 ? "s" : ""})</span>
+            </td>
+        </tr>`;
 
     cats.forEach((cat) => {
       const ids = sel[cat] || [];
       const limite = esAlaCarta ? 0 : maxSel[cat] || 0;
 
-      // Agrupar IDs duplicados conservando el orden de posición original
       const grupos = new Map();
       ids.forEach((id, pos) => {
         if (!grupos.has(id)) grupos.set(id, { qty: 0, posiciones: [] });
@@ -260,18 +265,14 @@ function construirHTMLFactura(reserva) {
           : posiciones.filter((pos) => pos < limite).length;
         const extraCount = esAlaCarta ? qty : qty - incluidoCount;
 
-        // Acumular subtotales por grupo
         if (esAlaCarta) {
           subtotalAlaCarta += p.precio * qty;
         } else {
           subtotalExtras += p.precio * extraCount;
         }
 
-        // Badge ×N (solo si qty > 1)
         const qtyBadge =
-          qty > 1
-            ? `<span style="display:inline-flex;align-items:center;justify-content:center;background:#D4AF37;color:#2C1810;border-radius:3px;font-size:0.68rem;font-weight:700;padding:1px 7px;margin-left:6px;line-height:1.5;vertical-align:middle;letter-spacing:0.02em;">×${qty}</span>`
-            : "";
+          qty > 1 ? `<span class="inv-qty-badge">×${qty}</span>` : "";
 
         const catLabel =
           cat === "principales"
@@ -286,33 +287,30 @@ function construirHTMLFactura(reserva) {
         let extraBadge = "";
 
         if (esAlaCarta) {
-          const total = p.precio * qty;
+          const tot = p.precio * qty;
           precioTxt =
             qty > 1
-              ? `<span style="font-size:0.8rem;color:#8B5A2B;">${qty}×${formatCurrency(p.precio)} =</span> <strong style="color:#C1272D;">${formatCurrency(total)}</strong>`
-              : `<strong style="color:#C1272D;">${formatCurrency(p.precio)}</strong>`;
+              ? `<span class="inv-price-detail">${qty}×${formatCurrency(p.precio)} =</span><strong class="inv-price-val">${formatCurrency(tot)}</strong>`
+              : `<strong class="inv-price-val">${formatCurrency(p.precio)}</strong>`;
         } else if (incluidoCount > 0 && extraCount === 0) {
-          // Todos incluidos
-          precioTxt = `<span style="color:#4CAF50;font-style:italic;">Incluido${qty > 1 ? " ×" + qty : ""}</span>`;
+          precioTxt = `<span class="inv-price-included">Incluido${qty > 1 ? " ×" + qty : ""}</span>`;
         } else if (incluidoCount === 0) {
-          // Todos extra
-          const total = p.precio * extraCount;
-          extraBadge = `<span style="background:#FFF0F0;color:#C1272D;border:1px solid #F8BBD0;border-radius:3px;font-size:0.68rem;font-weight:700;padding:1px 5px;margin-left:6px;vertical-align:middle;">+EXTRA</span>`;
+          const tot = p.precio * extraCount;
+          extraBadge = `<span class="inv-extra-badge">+EXTRA</span>`;
           precioTxt =
             extraCount > 1
-              ? `<span style="font-size:0.8rem;color:#8B5A2B;">${extraCount}×${formatCurrency(p.precio)} =</span> <strong style="color:#C1272D;">${formatCurrency(total)}</strong>`
-              : `<strong style="color:#C1272D;">${formatCurrency(p.precio)}</strong>`;
+              ? `<span class="inv-price-detail">${extraCount}×${formatCurrency(p.precio)} =</span><strong class="inv-price-val">${formatCurrency(tot)}</strong>`
+              : `<strong class="inv-price-val">${formatCurrency(p.precio)}</strong>`;
         } else {
-          // Mixto: algunos incluidos, algunos extra
-          const total = p.precio * extraCount;
-          extraBadge = `<span style="background:#FFF0F0;color:#C1272D;border:1px solid #F8BBD0;border-radius:3px;font-size:0.68rem;font-weight:700;padding:1px 5px;margin-left:6px;vertical-align:middle;">+EXTRA</span>`;
-          precioTxt = `<span style="color:#4CAF50;font-style:italic;">×${incluidoCount}&nbsp;Incl.</span> <span style="color:#555;">+</span> <strong style="color:#C1272D;">${extraCount > 1 ? extraCount + "×" + formatCurrency(p.precio) + " = " : ""}${formatCurrency(total)}</strong>`;
+          const tot = p.precio * extraCount;
+          extraBadge = `<span class="inv-extra-badge">+EXTRA</span>`;
+          precioTxt = `<span class="inv-price-included">×${incluidoCount}&nbsp;Incl.</span><span class="inv-price-sep">+</span><strong class="inv-price-val">${extraCount > 1 ? extraCount + "×" + formatCurrency(p.precio) + " = " : ""}${formatCurrency(tot)}</strong>`;
         }
 
-        filasHTML += `<tr>
-                  <td style="padding:9px 12px;border-bottom:1px solid #EEE;font-size:0.88rem;">${p.nombre}${qtyBadge}${extraBadge}</td>
-                  <td style="padding:9px 12px;border-bottom:1px solid #EEE;font-size:0.78rem;color:#8B5A2B;font-style:italic;">${catLabel}</td>
-                  <td style="padding:9px 12px;border-bottom:1px solid #EEE;font-size:0.88rem;text-align:right;font-weight:600;white-space:nowrap;">${precioTxt}</td>
+        filasHTML += `<tr class="inv-row-platillo">
+                    <td class="inv-td inv-td--name">${p.nombre}${qtyBadge}${extraBadge}</td>
+                    <td class="inv-td inv-td--cat">${catLabel}</td>
+                    <td class="inv-td inv-td--price">${precioTxt}</td>
                 </tr>`;
       });
     });
@@ -326,89 +324,92 @@ function construirHTMLFactura(reserva) {
   const subtotal = esAlaCarta ? subtotalAlaCarta : precioBase + subtotalExtras;
   const iva = +(subtotal * 0.16).toFixed(2);
   const total = +(subtotal + iva).toFixed(2);
-  const c = {
-    rojo: "#C1272D",
-    dorado: "#D4AF37",
-    oscuro: "#2C1810",
-    cafe: "#8B5A2B",
-    fondo: "#FAF3E7",
-    fondo2: "#FFF8ED",
-    gris: "#555",
-  };
 
-  return `<div style="font-family:'Poppins',Arial,sans-serif;max-width:720px;margin:0 auto;background:#FFF;color:${c.oscuro};border-radius:8px;box-shadow:0 4px 18px rgba(0,0,0,.08);">
-  <div style="background:linear-gradient(135deg,${c.rojo} 0%,#8B0000 100%);padding:28px 32px;border-radius:8px 8px 0 0;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
-    <div style="display:flex;align-items:center;gap:12px;color:#fff;">
-      <div style="width:45px;height:45px;background:${c.dorado};border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;">
-        <img src="img/logo.png" alt="Rasa Nusantara" style="width:100%;height:100%;object-fit:cover;display:block;">
-      </div>
-      <div>
-        <span style="font-family:'Playfair Display',serif;font-size:1.3rem;color:${c.dorado};font-weight:700;letter-spacing:1px;display:block;">Rasa Nusantara</span>
-        <span style="font-family:'Dancing Script',cursive;font-size:0.85rem;color:#fff;">Sabor del archipiélago</span>
-      </div>
+  return `
+<div class="inv">
+    <!-- ENCABEZADO -->
+    <div class="inv-header">
+        <div class="inv-brand">
+            <div class="inv-brand-logo">
+                <img src="img/logo.png" alt="Rasa Nusantara">
+            </div>
+            <div class="inv-brand-text">
+                <span class="inv-brand-name">Rasa Nusantara</span>
+                <span class="inv-brand-tagline">Sabor del archipiélago</span>
+            </div>
+        </div>
+        <div class="inv-meta">
+            <p class="inv-meta-label">Factura</p>
+            <p class="inv-meta-num">${numeroFactura}</p>
+            <p class="inv-meta-date">${fechaEmision}</p>
+        </div>
     </div>
-    <div style="text-align:right;">
-      <p style="margin:0;font-size:0.65rem;text-transform:uppercase;letter-spacing:.15em;color:${c.dorado};font-weight:700;">Factura</p>
-      <p style="margin:3px 0 4px;font-family:'Playfair Display',serif;font-size:1.1rem;color:#FFF;font-weight:700;">${numeroFactura}</p>
-      <p style="margin:0;font-size:0.76rem;color:rgba(255,255,255,.75);">${fechaEmision}</p>
+
+    <!-- PARTES -->
+    <div class="inv-parties">
+        <div class="inv-party">
+            <p class="inv-party-label">Facturar a</p>
+            <p class="inv-party-name">${reserva.userName}</p>
+            <p class="inv-party-detail">${reserva.userEmail}</p>
+            ${reserva.telefono ? `<p class="inv-party-detail">Tel: ${reserva.telefono}</p>` : ""}
+        </div>
+        <div class="inv-party inv-party--right">
+            <p class="inv-party-label">Reservación</p>
+            <p class="inv-party-detail">${formatDate(reserva.fecha)} · ${reserva.hora}</p>
+            <p class="inv-party-detail">${area ? area.nombre : reserva.area} · Mesa #${reserva.mesa?.split("-m")[1]}</p>
+            <p class="inv-party-detail">${menu ? menu.nombre : reserva.menu} · ${reserva.personas} pax</p>
+        </div>
     </div>
-  </div>
-  <div style="display:flex;gap:20px;flex-wrap:wrap;background:${c.fondo};border-left:4px solid ${c.dorado};padding:16px 22px;">
-    <div style="flex:1;min-width:200px;">
-      <p style="margin:0 0 6px;font-size:0.65rem;text-transform:uppercase;letter-spacing:.12em;color:${c.cafe};font-weight:700;">Facturar a</p>
-      <p style="margin:0 0 3px;font-family:'Playfair Display',serif;font-size:1rem;color:${c.oscuro};font-weight:700;">${reserva.userName}</p>
-      <p style="margin:2px 0;font-size:0.82rem;color:${c.gris};">${reserva.userEmail}</p>
-      ${reserva.telefono ? `<p style="margin:2px 0;font-size:0.82rem;color:${c.gris};">Tel: ${reserva.telefono}</p>` : ""}
+
+    <!-- TABLA DE PLATILLOS -->
+    <div class="inv-table-wrap">
+        <table class="inv-table">
+            <thead>
+                <tr>
+                    <th class="inv-th inv-th--name">Platillo</th>
+                    <th class="inv-th inv-th--cat">Categoría</th>
+                    <th class="inv-th inv-th--price">Precio</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${hayPlatillos ? filasHTML : `<tr><td colspan="3" class="inv-empty">Sin platillos registrados</td></tr>`}
+            </tbody>
+        </table>
     </div>
-    <div style="flex:1;min-width:200px;text-align:right;">
-      <p style="margin:0 0 6px;font-size:0.65rem;text-transform:uppercase;letter-spacing:.12em;color:${c.cafe};font-weight:700;">Reservación</p>
-      <p style="margin:2px 0;font-size:0.82rem;color:${c.gris};">${formatDate(reserva.fecha)} · ${reserva.hora}</p>
-      <p style="margin:2px 0;font-size:0.82rem;color:${c.gris};">${area ? area.nombre : reserva.area} · Mesa #${reserva.mesa?.split("-m")[1]}</p>
-      <p style="margin:2px 0;font-size:0.82rem;color:${c.gris};">${menu ? menu.nombre : reserva.menu} · ${reserva.personas} pax</p>
-    </div>
-  </div>
-  <div style="padding:20px 22px;">
-    <table style="width:100%;border-collapse:collapse;">
-      <thead>
-        <tr style="background:${c.fondo2};">
-          <th style="padding:10px 12px;font-size:0.78rem;text-transform:uppercase;letter-spacing:.1em;color:${c.cafe};text-align:left;">Platillo</th>
-          <th style="padding:10px 12px;font-size:0.78rem;text-transform:uppercase;letter-spacing:.1em;color:${c.cafe};">Categoría</th>
-          <th style="padding:10px 12px;font-size:0.78rem;text-transform:uppercase;letter-spacing:.1em;color:${c.cafe};text-align:right;">Precio</th>
-        </tr>
-      </thead>
-      <tbody>${filasHTML}</tbody>
-    </table>
-    <div style="margin-top:18px;border-top:2px solid ${c.dorado};padding-top:14px;">
-      <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:0.88rem;color:${c.gris};">
+
+    <!-- RESUMEN DE PRECIOS -->
+    <div class="inv-totals">
+        <div class="inv-totals-row">
+            <span>${esAlaCarta ? `A la Carta — ${reserva.personas} pax` : `${menu ? menu.nombre : ""} × ${reserva.personas} pax`}</span>
+            <span>${formatCurrency(esAlaCarta ? subtotalAlaCarta : precioBase)}</span>
+        </div>
         ${
-          esAlaCarta
-            ? `<span>A la Carta — ${reserva.personas} pax</span><span>${formatCurrency(subtotalAlaCarta)}</span>`
-            : `<span>Menú base (${menu ? menu.nombre : ""} × ${reserva.personas} pax)</span><span>${formatCurrency(precioBase)}</span>`
+          !esAlaCarta && subtotalExtras > 0
+            ? `
+        <div class="inv-totals-row inv-totals-row--extra">
+            <span>Extras adicionales</span>
+            <span>${formatCurrency(subtotalExtras)}</span>
+        </div>`
+            : ""
         }
-      </div>
-      ${
-        !esAlaCarta && subtotalExtras > 0
-          ? `<div style="display:flex;justify-content:space-between;padding:5px 0;font-size:0.88rem;color:${c.rojo};">
-        <span>Extras adicionales</span><span>${formatCurrency(subtotalExtras)}</span>
-      </div>`
-          : ""
-      }
-      <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:0.88rem;color:${c.gris};">
-        <span>Subtotal</span><span>${formatCurrency(subtotal)}</span>
-      </div>
-      <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:0.88rem;color:${c.gris};">
-        <span>IVA (16%)</span><span>${formatCurrency(iva)}</span>
-      </div>
-      <div style="display:flex;justify-content:space-between;padding:10px 0 5px;font-family:'Playfair Display',serif;font-size:1.1rem;color:${c.rojo};font-weight:700;border-top:1px dashed ${c.dorado};margin-top:6px;">
-        <span>Total</span><span>${formatCurrency(total)}</span>
-      </div>
+        <div class="inv-totals-row">
+            <span>Subtotal</span>
+            <span>${formatCurrency(subtotal)}</span>
+        </div>
+        <div class="inv-totals-row">
+            <span>IVA (16%)</span>
+            <span>${formatCurrency(iva)}</span>
+        </div>
+        <div class="inv-totals-row inv-totals-row--total">
+            <span>TOTAL</span>
+            <span>${formatCurrency(total)}</span>
+        </div>
     </div>
-  </div>
-  <div style="background:${c.fondo};border-radius:0 0 8px 8px;padding:14px 22px;text-align:center;">
-    <p style="margin:0;font-size:0.78rem;color:${c.cafe};font-style:italic;">
-      Esta factura es un comprobante informativo generado automáticamente.
-    </p>
-  </div>
+
+    <!-- PIE -->
+    <div class="inv-footer">
+        <p>Esta factura es un comprobante informativo generado automáticamente.</p>
+    </div>
 </div>`;
 }
 
