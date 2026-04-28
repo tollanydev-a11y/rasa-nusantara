@@ -2,21 +2,16 @@
    MÓDULO: SELECCIÓN DE PLATILLOS (menu.html)
 
    Comportamiento:
-   1. La carta completa es visible SIEMPRE (no requiere login ni reserva)
-   2. Si NO hay reserva habilitada:
-      - No se muestra .active-reservation-info
-      - No se muestra contador "Elige 1 (0/1)"
-      - Hacer click NO agrega la clase 'selected'
-      - No hay botón "Guardar selección"
-   3. Si HAY reserva con menuSelectionEnabled=true:
-      - Se muestra banner de reserva activa
-      - Se muestra contador de selección
-      - Click agrega/quita 'selected'
-      - Tabs por cliente (1 tab por cada persona de la reserva)
-      - Botón "Guardar selección"
+   1. La carta es visible SIEMPRE (sin sesión = solo lectura)
+   2. Con reserva activa + menuSelectionEnabled:
+      - Banner de reserva, tabs por comensal
+      - Modo compacto en móvil/tablet (2 cols, imagen pequeña, +/−)
+      - Sticky tray inferior con progreso por categoría
+      - Cada platillo admite CANTIDAD (×1, ×2, ×3...)
+      - Menú "A la Carta": sin límites, precio dinámico
    =================================================== */
 
-import { MENUS, PLATILLOS, refreshPlatillos } from "./data.js";
+import { MENUS, PLATILLOS, getPlatillos, refreshPlatillos } from "./data.js";
 import {
   showToast,
   formatCurrency,
@@ -34,29 +29,16 @@ import { USE_DEMO_MODE } from "./firebase-config.js";
 // ESTADO
 // ==========================================================
 const state = {
-  reservaActiva: null, // Reserva con menuSelectionEnabled o null
-  menu: null, // MENUS[reservaActiva.menu] o null
-  clienteActivo: 0, // índice del comensal actual en la tab
-  // Array de selecciones, una entrada por cliente
-  // [{ entradas:[], principales:[], postres:[], bebidas:[] }, ...]
+  reservaActiva: null,
+  menu: null,
+  clienteActivo: 0,
+  // Selecciones como array de IDs con duplicados:
+  // ["e1", "e1", "e2"] → e1×2, e2×1
+  // Estructura: [{ entradas:[], principales:[], postres:[], bebidas:[] }, ...]
   seleccionesPorCliente: [],
+  // Modo compacto activo (≤ 900px en horizontal con reserva activa)
+  compacto: false,
 };
-
-// ==========================================================
-// HELPERS
-// ==========================================================
-function renderTags(tags) {
-  if (!tags || !tags.length) return "";
-  return `
-        <div class="tag-list">
-            ${tags.map((t) => `<span class="tag">${t}</span>`).join("")}
-        </div>
-    `;
-}
-
-function crearSeleccionVacia() {
-  return { entradas: [], principales: [], postres: [], bebidas: [] };
-}
 
 // ==========================================================
 // INICIALIZACIÓN
@@ -64,7 +46,6 @@ function crearSeleccionVacia() {
 document.addEventListener("DOMContentLoaded", async () => {
   if (!document.getElementById("seleccion-platillos")) return;
 
-  // En prod: cargar platillos desde Firestore antes de renderizar
   if (!USE_DEMO_MODE) {
     try {
       await refreshPlatillos();
@@ -73,24 +54,70 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  // NO usa protectPage() — el menú debe ser visible siempre
   await detectarReservaActiva();
+  detectarModoCompacto();
   render();
   initEventListeners();
+  initStickyTray();
+
+  window.addEventListener("resize", () => {
+    detectarModoCompacto();
+    render();
+    actualizarStickyTray();
+  });
 });
 
+function detectarModoCompacto() {
+  // Modo compacto solo cuando hay reserva activa y pantalla ≤ 900px
+  state.compacto = !!state.reservaActiva && window.innerWidth <= 900;
+}
+
 // ==========================================================
-// Buscar reserva del usuario que cumpla condiciones
+// HELPERS
+// ==========================================================
+function renderTags(tags) {
+  if (!tags || !tags.length) return "";
+  return `<div class="tag-list">${tags.map((t) => `<span class="tag">${t}</span>`).join("")}</div>`;
+}
+
+function crearSeleccionVacia() {
+  return { entradas: [], principales: [], postres: [], bebidas: [] };
+}
+
+/** Cantidad de veces que aparece platilloId en el array de una categoría */
+function getQty(clienteIdx, categoria, platilloId) {
+  const arr = state.seleccionesPorCliente[clienteIdx]?.[categoria] || [];
+  return arr.filter((id) => id === platilloId).length;
+}
+
+/** Total de platillos seleccionados (contando duplicados) */
+function totalEnCategoria(clienteIdx, categoria) {
+  return (state.seleccionesPorCliente[clienteIdx]?.[categoria] || []).length;
+}
+
+/** Precio total A la Carta para un cliente (suma precio × qty de cada platillo) */
+function calcularTotalAlaCarta(clienteIdx) {
+  const todos = getPlatillos();
+  const sel = state.seleccionesPorCliente[clienteIdx];
+  if (!sel) return 0;
+  let total = 0;
+  ["entradas", "principales", "postres", "bebidas"].forEach((cat) => {
+    (sel[cat] || []).forEach((id) => {
+      const p = todos.find((x) => x.id === id);
+      if (p) total += p.precio;
+    });
+  });
+  return total;
+}
+
+// ==========================================================
+// DETECTAR RESERVA ACTIVA
 // ==========================================================
 async function detectarReservaActiva() {
   const user = getCurrentUser();
-  if (!user) {
-    // Sin sesión: no hay reserva activa, pero el menú sí se muestra
-    return;
-  }
+  if (!user) return;
 
   const misReservas = await getReservacionesDelUsuario(user.uid);
-
   const habilitadas = misReservas
     .filter((r) => r.estado === "confirmed" && r.menuSelectionEnabled)
     .sort((a, b) =>
@@ -100,12 +127,8 @@ async function detectarReservaActiva() {
   if (habilitadas.length > 0) {
     state.reservaActiva = habilitadas[0];
     state.menu = MENUS[state.reservaActiva.menu];
-
-    // Inicializar seleccionesPorCliente del tamaño de personas
     const nPersonas = state.reservaActiva.personas || 1;
     state.seleccionesPorCliente = [];
-
-    // Restaurar selecciones previas si existen
     const previas = state.reservaActiva.menuSelectionsByClient;
     for (let i = 0; i < nPersonas; i++) {
       if (previas && previas[i]) {
@@ -119,142 +142,116 @@ async function detectarReservaActiva() {
         state.seleccionesPorCliente.push(crearSeleccionVacia());
       }
     }
-
     state.clienteActivo = 0;
   }
 }
 
 // ==========================================================
-// RENDER
+// RENDER PRINCIPAL
 // ==========================================================
 function render() {
   const container = document.getElementById("seleccion-platillos");
   if (!container) return;
-
   container.innerHTML = renderCartaCompleta();
+  actualizarStickyTray();
 }
 
 function renderCartaCompleta() {
   const enabled = !!state.reservaActiva;
   const menu = state.menu;
+  const esAlaCarta = menu?.id === "alacarta";
 
-  // Solo mostrar el banner de reserva activa si HAY reserva habilitada
   const bannerHTML = enabled ? renderActiveReservationInfo() : "";
-
-  // Tabs de clientes solo si hay reserva habilitada
   const tabsHTML = enabled ? renderClientesTabs() : "";
 
-  // Categorías a mostrar:
-  // - Si hay reserva: solo las que contempla el menú
-  // - Si no: todas las categorías
   const categoriasAMostrar = enabled
     ? [...new Set(menu.estructura)]
     : ["entradas", "principales", "postres", "bebidas"];
 
-  // Header del paper
   const header = enabled
     ? `<div class="menu-paper-header">
-                <p class="paper-eyebrow">Personaliza tu experiencia</p>
-                <h2>Carta de degustación</h2>
-                <p>Elige los platillos de cada tiempo de tu ${menu.nombre.toLowerCase()}.</p>
-            </div>`
+        <p class="paper-eyebrow">Personaliza tu experiencia</p>
+        <h2>Carta de degustación</h2>
+        <p>${
+          esAlaCarta
+            ? "Elige libremente los platillos que desees. El total se calculará según tu selección."
+            : `Elige los platillos de cada tiempo de tu ${menu.nombre.toLowerCase()}.`
+        }</p>
+       </div>`
     : `<div class="menu-paper-header">
-                <p class="paper-eyebrow">Nuestra carta</p>
-                <h2>Menú Nusantara</h2>
-                <p>Explora todos los sabores del archipiélago indonesio.</p>
-            </div>`;
+        <p class="paper-eyebrow">Nuestra carta</p>
+        <h2>Menú Nusantara</h2>
+        <p>Explora todos los sabores del archipiélago indonesio.</p>
+       </div>`;
 
+  // Progreso y botón guardar
   let saveBtnHTML = "";
   if (enabled) {
-    const { completo, totalSeleccionados, totalRequeridos, totalExtras } =
+    const { completo, totalSeleccionados, totalRequeridos } =
       calcularProgresoCliente(state.clienteActivo);
-    const faltantes = Math.max(0, totalRequeridos - totalSeleccionados);
-
-    // Calcular costo estimado de extras de TODOS los clientes
-    let costoExtrasTotal = 0;
-    state.seleccionesPorCliente.forEach((sel) => {
-      Object.entries(menu.maxSelecciones).forEach(([cat, max]) => {
-        const ids = sel[cat] || [];
-        ids.slice(max).forEach((id) => {
-          const p = Object.values(PLATILLOS)
-            .flat()
-            .find((x) => x.id === id);
-          if (p) costoExtrasTotal += p.precio;
-        });
-      });
-    });
-
-    const avisoExtras =
-      totalExtras > 0
-        ? `<div class="extras-warning-banner">
-                   <i class="fa-solid fa-circle-exclamation"></i>
-                   <div>
-                       <strong>${totalExtras} platillo${totalExtras > 1 ? "s" : ""} extra${totalExtras > 1 ? "s" : ""}</strong>
-                       para este comensal — se añadirán a tu factura según lo consumido.
-                   </div>
-               </div>`
-        : "";
-
-    const avisoExtrasGlobal =
-      costoExtrasTotal > 0
-        ? `<p style="font-size:0.8rem;color:var(--color-text-light);margin-top:10px;">
-                   <i class="fa-solid fa-receipt"></i>
-                   Cargo estimado por extras: <strong style="color:var(--color-primary);">
-                   ${formatCurrency(costoExtrasTotal)}</strong> + IVA
-               </p>`
-        : "";
+    const totalAC = esAlaCarta ? calcularTotalAlaCarta(state.clienteActivo) : 0;
 
     saveBtnHTML = `
-            <div class="btn-save-selection">
-                <p style="font-size: 0.9rem; color: var(--color-text-light); margin-bottom: 10px;">
-                    <strong>${totalSeleccionados} / ${totalRequeridos}</strong> platillos seleccionados para
-                    <strong>${nombreCliente(state.clienteActivo)}</strong>
-                </p>
-                ${avisoExtras}
-                <button id="btn-guardar-seleccion" class="btn btn-primary btn-lg" ${completoTodosLosClientes() ? "" : "disabled"}>
-                    <i class="fa-solid fa-check"></i>
-                    ${completoTodosLosClientes() ? "Guardar selección" : "Completa la selección de todos"}
-                </button>
-                <p style="font-size: 0.82rem; color: var(--color-text-light); margin-top: 14px;">
-                    <i class="fa-solid fa-circle-info"></i>
-                    ${
-                      completo
-                        ? `Este comensal ya completó su selección.`
-                        : `Faltan ${faltantes} platillo${faltantes > 1 ? "s" : ""} por elegir para este comensal.`
-                    }
-                </p>
-                ${avisoExtrasGlobal}
-            </div>
-        `;
+      <div class="btn-save-selection">
+        <p style="font-size:0.9rem;color:var(--color-text-light);margin-bottom:10px;">
+          ${
+            esAlaCarta
+              ? `<strong>${totalSeleccionados}</strong> platillos · Total estimado: <strong>${formatCurrency(totalAC)}</strong>`
+              : `<strong>${totalSeleccionados} / ${totalRequeridos}</strong> platillos seleccionados para <strong>${nombreCliente(state.clienteActivo)}</strong>`
+          }
+        </p>
+        <button id="btn-guardar-seleccion" class="btn btn-primary btn-lg"
+                ${(esAlaCarta ? totalSeleccionados > 0 : completoTodosLosClientes()) ? "" : "disabled"}>
+          <i class="fa-solid fa-check"></i>
+          ${
+            (esAlaCarta ? totalSeleccionados > 0 : completoTodosLosClientes())
+              ? "Guardar selección"
+              : esAlaCarta
+                ? "Selecciona al menos un platillo"
+                : "Completa la selección de todos"
+          }
+        </button>
+      </div>`;
   }
 
+  // Botón de toggle compacto (solo visible en tablet/móvil con reserva activa)
+  const toggleCompactoBtn = enabled
+    ? `<button id="btn-toggle-compacto" class="btn btn-outline btn-sm"
+              style="margin:12px 0 0;${window.innerWidth > 900 ? "display:none;" : ""}">
+         <i class="fa-solid fa-${state.compacto ? "expand" : "compress"}"></i>
+         ${state.compacto ? "Vista completa" : "Vista compacta"}
+       </button>`
+    : "";
+
   return `
-        ${bannerHTML}
-        <div class="menu-paper ${enabled ? "" : "view-only"}">
-            ${header}
-            ${tabsHTML}
-            ${categoriasAMostrar.map((cat) => renderCategoria(cat, enabled)).join("")}
-            ${saveBtnHTML}
-        </div>
-    `;
+    ${bannerHTML}
+    <div class="menu-paper ${enabled ? "" : "view-only"}">
+      ${header}
+      ${tabsHTML}
+      ${toggleCompactoBtn}
+      ${categoriasAMostrar.map((cat) => renderCategoria(cat, enabled)).join("")}
+      ${saveBtnHTML}
+    </div>`;
 }
 
+// ==========================================================
+// BANNER DE RESERVA ACTIVA
+// ==========================================================
 function renderActiveReservationInfo() {
   const r = state.reservaActiva;
   const menu = state.menu;
   return `
-        <div class="active-reservation-info">
-            <div>
-                <h4>Seleccionando platillos para:</h4>
-                <p>
-                    <i class="fa-solid fa-calendar"></i> ${formatDate(r.fecha)}
-                    · <i class="fa-solid fa-clock"></i> ${r.hora}
-                    · <i class="fa-solid fa-users"></i> ${r.personas} pax
-                </p>
-            </div>
-            <span class="info-badge">${menu.nombre} · ${menu.tiempos} tiempos</span>
-        </div>
-    `;
+    <div class="active-reservation-info">
+      <div>
+        <h4>Seleccionando platillos para:</h4>
+        <p>
+          <i class="fa-solid fa-calendar"></i> ${formatDate(r.fecha)}
+          · <i class="fa-solid fa-clock"></i> ${r.hora}
+          · <i class="fa-solid fa-users"></i> ${r.personas} pax
+        </p>
+      </div>
+      <span class="info-badge">${menu.nombre} · ${menu.id === "alacarta" ? "Libre" : `${menu.tiempos} tiempos`}</span>
+    </div>`;
 }
 
 // ==========================================================
@@ -263,39 +260,33 @@ function renderActiveReservationInfo() {
 function nombreCliente(idx) {
   const r = state.reservaActiva;
   if (!r) return `Cliente ${idx + 1}`;
-  const nombre = r.personasNombres && r.personasNombres[idx];
-  if (nombre && nombre.trim()) return nombre.trim();
-  return `Cliente ${idx + 1}`;
+  const n = r.personasNombres?.[idx];
+  return n?.trim() || `Cliente ${idx + 1}`;
 }
 
 function renderClientesTabs() {
   const r = state.reservaActiva;
   if (!r) return "";
-
   const tabs = [];
   for (let i = 0; i < r.personas; i++) {
     const { completo } = calcularProgresoCliente(i);
     const activa = i === state.clienteActivo;
     tabs.push(`
-            <button type="button"
-                    class="cliente-tab ${activa ? "active" : ""} ${completo ? "completed" : ""}"
-                    data-cliente-index="${i}">
-                <span class="cliente-tab-num">${i + 1}</span>
-                <span class="cliente-tab-name">${nombreCliente(i)}</span>
-                ${completo ? '<i class="fa-solid fa-check cliente-tab-check"></i>' : ""}
-            </button>
-        `);
+      <button type="button"
+              class="cliente-tab ${activa ? "active" : ""} ${completo ? "completed" : ""}"
+              data-cliente-index="${i}">
+        <span class="cliente-tab-num">${i + 1}</span>
+        <span class="cliente-tab-name">${nombreCliente(i)}</span>
+        ${completo ? '<i class="fa-solid fa-check cliente-tab-check"></i>' : ""}
+      </button>`);
   }
-
   return `
-        <div class="clientes-tabs-wrap">
-            <p class="clientes-tabs-label">
-                <i class="fa-solid fa-user-group"></i>
-                Selección individual por comensal
-            </p>
-            <div class="clientes-tabs">${tabs.join("")}</div>
-        </div>
-    `;
+    <div class="clientes-tabs-wrap">
+      <p class="clientes-tabs-label">
+        <i class="fa-solid fa-user-group"></i> Selección individual por comensal
+      </p>
+      <div class="clientes-tabs">${tabs.join("")}</div>
+    </div>`;
 }
 
 // ==========================================================
@@ -310,98 +301,203 @@ function renderCategoria(categoriaPlural, enabled) {
   };
 
   const platillos = PLATILLOS[categoriaPlural];
-  if (!platillos || platillos.length === 0) return "";
+  if (!platillos?.length) return "";
 
+  const esAlaCarta = state.menu?.id === "alacarta";
   let contadorHTML = "";
-  let seleccionados = [];
+  let totalActual = 0;
+  let max = 0;
+
   if (enabled) {
-    const max = state.menu.maxSelecciones[categoriaPlural];
-    if (max === 0) return "";
-    seleccionados =
-      state.seleccionesPorCliente[state.clienteActivo][categoriaPlural];
-    const cantActual = seleccionados.length;
-    const extras = Math.max(0, cantActual - max);
+    max = state.menu.maxSelecciones[categoriaPlural];
+    if (!esAlaCarta && max === 0) return ""; // categoría no incluida
 
-    const colorContador =
-      extras > 0
-        ? "color: #C1272D; font-weight: 700;"
-        : "color: var(--color-text-light);";
-    const etiquetaExtra =
-      extras > 0
-        ? `<span class="cat-extra-badge">+${extras} extra${extras > 1 ? "s" : ""}</span>`
-        : "";
+    totalActual = totalEnCategoria(state.clienteActivo, categoriaPlural);
 
-    contadorHTML = `
-            <span style="font-size: 0.8rem; font-weight: normal; ${colorContador} margin-left: auto; display:inline-flex; align-items:center; gap:6px;">
-                Elige ${max} (${cantActual}/${max}) ${etiquetaExtra}
-            </span>
-        `;
+    if (esAlaCarta) {
+      contadorHTML =
+        totalActual > 0
+          ? `<span style="font-size:0.8rem;font-weight:normal;color:var(--color-primary);margin-left:auto;">${totalActual} elegido${totalActual > 1 ? "s" : ""}</span>`
+          : "";
+    } else {
+      const extras = Math.max(0, totalActual - max);
+      const colorStyle =
+        extras > 0
+          ? "color:#C1272D;font-weight:700;"
+          : "color:var(--color-text-light);";
+      const extraBadge =
+        extras > 0
+          ? `<span class="cat-extra-badge">+${extras} extra${extras > 1 ? "s" : ""}</span>`
+          : "";
+      contadorHTML = `
+        <span style="font-size:0.8rem;font-weight:normal;${colorStyle}margin-left:auto;display:inline-flex;align-items:center;gap:6px;">
+          Elige ${max} (${totalActual}/${max}) ${extraBadge}
+        </span>`;
+    }
   }
 
+  const compactoClass = state.compacto ? "menu-items--compact" : "";
+
   return `
-        <div class="menu-category" data-categoria="${categoriaPlural}">
-            <h3>${titulos[categoriaPlural]}${contadorHTML}</h3>
-            <div class="menu-items">
-                ${platillos.map((p) => renderMenuItem(p, categoriaPlural, seleccionados, enabled)).join("")}
-            </div>
-        </div>
-    `;
+    <div class="menu-category" data-categoria="${categoriaPlural}" id="cat-${categoriaPlural}">
+      <h3>${titulos[categoriaPlural]}${contadorHTML}</h3>
+      <div class="menu-items ${compactoClass}">
+        ${platillos.map((p) => renderMenuItem(p, categoriaPlural, enabled)).join("")}
+      </div>
+    </div>`;
 }
 
-function renderMenuItem(platillo, categoriaPlural, seleccionados, enabled) {
-  const seleccionado = enabled && seleccionados.includes(platillo.id);
-  const max =
-    enabled && state.menu ? state.menu.maxSelecciones[categoriaPlural] : 0;
-  // El ítem es "extra" cuando ya está seleccionado y su posición supera el límite
-  const posicion = seleccionado ? seleccionados.indexOf(platillo.id) : -1;
-  const esExtra = seleccionado && max > 0 && posicion >= max;
+// ==========================================================
+// RENDER ITEM INDIVIDUAL
+// ==========================================================
+function renderMenuItem(platillo, categoriaPlural, enabled) {
+  const qty = enabled
+    ? getQty(state.clienteActivo, categoriaPlural, platillo.id)
+    : 0;
+  const seleccionado = qty > 0;
+  const esAlaCarta = state.menu?.id === "alacarta";
+  const max = enabled ? (state.menu?.maxSelecciones[categoriaPlural] ?? 0) : 0;
+  let esExtra = false;
+  if (!esAlaCarta && seleccionado && max > 0) {
+    const arr =
+      state.seleccionesPorCliente[state.clienteActivo]?.[categoriaPlural] || [];
+    esExtra = arr.some((id, pos) => id === platillo.id && pos >= max);
+  }
 
+  // Controles de cantidad (solo en modo activo)
+  let qtyControlsHTML = "";
+  if (enabled && seleccionado) {
+    const puedeAgregar = esAlaCarta || qty < max * 3; // límite razonable de extras
+    qtyControlsHTML = `
+      <div class="qty-controls" data-platillo-id="${platillo.id}" data-categoria="${categoriaPlural}">
+        <button class="qty-btn qty-btn--minus" data-action="minus"
+                data-platillo-id="${platillo.id}" data-categoria="${categoriaPlural}"
+                aria-label="Quitar uno">
+          <i class="fa-solid fa-minus"></i>
+        </button>
+        <span class="qty-badge">${qty}</span>
+        <button class="qty-btn qty-btn--plus" data-action="plus"
+                data-platillo-id="${platillo.id}" data-categoria="${categoriaPlural}"
+                ${puedeAgregar ? "" : "disabled"}
+                aria-label="Agregar uno">
+          <i class="fa-solid fa-plus"></i>
+        </button>
+      </div>`;
+  } else if (enabled && !seleccionado) {
+    // Botón de agregar inicial (cuando qty=0, no hay controles +/−)
+    qtyControlsHTML = `
+      <div class="qty-controls" style="justify-content:flex-end;">
+        <button class="qty-btn qty-btn--add" data-action="plus"
+                data-platillo-id="${platillo.id}" data-categoria="${categoriaPlural}"
+                title="Agregar">
+          <i class="fa-solid fa-plus"></i>
+        </button>
+      </div>`;
+  }
+
+  // Badge de extra
   const badgeExtra = esExtra
     ? `<span class="menu-item-extra-badge">
-               <i class="fa-solid fa-circle-exclamation"></i>
-               Extra · ${formatCurrency(platillo.precio)} se añade a tu factura
-           </span>`
+         <i class="fa-solid fa-circle-exclamation"></i> Extra · ${formatCurrency(platillo.precio)} extra
+       </span>`
     : "";
 
   return `
-        <div class="menu-item ${seleccionado ? "selected" : ""} ${esExtra ? "menu-item--extra" : ""} ${enabled ? "" : "view-only"}"
-             data-platillo-id="${platillo.id}"
-             data-categoria="${categoriaPlural}">
-            ${renderPlatilloImage(platillo)}
-            <div class="menu-item-content">
-                <div class="menu-item-header">
-                    <span class="menu-item-name">${platillo.nombre}</span>
-                    <span class="menu-item-price">${formatCurrency(platillo.precio)}</span>
-                </div>
-                <div class="menu-item-origin">— ${platillo.origen}</div>
-                <div class="menu-item-desc">${platillo.descripcion}</div>
-                ${
-                  platillo.picante
-                    ? `
-                    <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin-top:6px;">
-                        ${renderSpicyInline(platillo.picante)}
-                    </div>
-                `
-                    : ""
-                }
-                ${renderTags(platillo.tags)}
-                ${badgeExtra}
-            </div>
+    <div class="menu-item ${seleccionado ? "selected" : ""} ${esExtra ? "menu-item--extra" : ""} ${enabled ? "" : "view-only"} ${state.compacto ? "menu-item--compact-card" : ""}"
+         data-platillo-id="${platillo.id}"
+         data-categoria="${categoriaPlural}">
+      ${renderPlatilloImage(platillo)}
+      <div class="menu-item-content">
+        <div class="menu-item-header">
+          <span class="menu-item-name">${platillo.nombre}</span>
+          <span class="menu-item-price">${formatCurrency(platillo.precio)}</span>
         </div>
-    `;
+        ${state.compacto ? "" : `<div class="menu-item-origin">— ${platillo.origen}</div>`}
+        ${state.compacto ? "" : `<div class="menu-item-desc">${platillo.descripcion}</div>`}
+        ${state.compacto ? "" : platillo.picante ? `<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:6px;">${renderSpicyInline(platillo.picante)}</div>` : ""}
+        ${state.compacto ? "" : renderTags(platillo.tags)}
+        ${badgeExtra}
+        ${qtyControlsHTML}
+      </div>
+    </div>`;
 }
 
-// Envoltorio local para no importar renderSpicyLevel del main solo para esto
 function renderSpicyInline(level) {
-  if (!level || level === 0) return "";
+  if (!level) return "";
   const peppers = "🌶️".repeat(level);
   const etiquetas = ["", "Suave", "Medio", "Picante", "Muy picante"];
-  return `
-        <span class="spicy-level spicy-level--${level}">
-            <span class="spicy-level-peppers">${peppers}</span>
-            <span class="spicy-level-text">${etiquetas[level]}</span>
+  return `<span class="spicy-level spicy-level--${level}">
+    <span class="spicy-level-peppers">${peppers}</span>
+    <span class="spicy-level-text">${etiquetas[level]}</span>
+  </span>`;
+}
+
+// ==========================================================
+// STICKY TRAY (barra inferior de progreso)
+// ==========================================================
+function initStickyTray() {
+  if (document.getElementById("selection-tray")) return;
+  const tray = document.createElement("div");
+  tray.id = "selection-tray";
+  tray.className = "selection-tray";
+  document.body.appendChild(tray);
+}
+
+function actualizarStickyTray() {
+  const tray = document.getElementById("selection-tray");
+  if (!tray) return;
+
+  if (!state.reservaActiva) {
+    tray.classList.remove("active");
+    document.body.classList.remove("tray-active");
+    return;
+  }
+
+  tray.classList.add("active");
+  document.body.classList.add("tray-active");
+
+  const menu = state.menu;
+  const clienteIdx = state.clienteActivo;
+  const esAlaCarta = menu?.id === "alacarta";
+
+  const categorias = ["entradas", "principales", "postres", "bebidas"];
+  const etiquetas = {
+    entradas: "Entradas",
+    principales: "Principales",
+    postres: "Postres",
+    bebidas: "Bebidas",
+  };
+
+  let html = `<span class="tray-cliente">👤 ${nombreCliente(clienteIdx)}</span>`;
+
+  categorias.forEach((cat) => {
+    if (!esAlaCarta && menu?.maxSelecciones[cat] === 0) return; // skip si no aplica
+    const actual = totalEnCategoria(clienteIdx, cat);
+    const max = esAlaCarta ? null : menu?.maxSelecciones[cat];
+    const done = esAlaCarta ? actual > 0 : actual >= max;
+    html += `
+      <span class="tray-separator"></span>
+      <a class="tray-cat" href="#cat-${cat}" onclick="event.preventDefault(); document.getElementById('cat-${cat}')?.scrollIntoView({behavior:'smooth', block:'start'})">
+        <span class="tray-cat-label">${etiquetas[cat]}</span>
+        <span class="tray-cat-count ${done ? "done" : ""}">
+          ${esAlaCarta ? (actual > 0 ? `${actual} ✓` : "—") : `${actual}/${max}${done ? " ✓" : ""}`}
         </span>
-    `;
+      </a>`;
+  });
+
+  // Total A la Carta
+  if (esAlaCarta) {
+    const total = calcularTotalAlaCarta(clienteIdx);
+    if (total > 0) {
+      html += `<span class="tray-separator"></span>
+        <span class="tray-cat" style="cursor:default;">
+          <span class="tray-cat-label">Total</span>
+          <span class="tray-cat-count" style="color:var(--color-secondary)">${formatCurrency(total)}</span>
+        </span>`;
+    }
+  }
+
+  tray.innerHTML = html;
 }
 
 // ==========================================================
@@ -409,32 +505,35 @@ function renderSpicyInline(level) {
 // ==========================================================
 function calcularProgresoCliente(idx) {
   if (!state.reservaActiva)
-    return {
-      completo: false,
-      totalSeleccionados: 0,
-      totalRequeridos: 0,
-      totalExtras: 0,
-    };
+    return { completo: false, totalSeleccionados: 0, totalRequeridos: 0 };
 
   const menu = state.menu;
-  const seleccion = state.seleccionesPorCliente[idx];
+  const esAlaCarta = menu?.id === "alacarta";
+  const sel = state.seleccionesPorCliente[idx];
   let totalRequeridos = 0;
   let totalSeleccionados = 0;
-  let totalExtras = 0;
+
+  if (esAlaCarta) {
+    const total = ["entradas", "principales", "postres", "bebidas"].reduce(
+      (s, c) => s + (sel?.[c]?.length || 0),
+      0,
+    );
+    return {
+      completo: total > 0,
+      totalSeleccionados: total,
+      totalRequeridos: 0,
+    };
+  }
 
   Object.entries(menu.maxSelecciones).forEach(([cat, max]) => {
-    const cant = (seleccion[cat] || []).length;
     totalRequeridos += max;
-    totalSeleccionados += cant;
-    if (cant > max) totalExtras += cant - max;
+    totalSeleccionados += (sel?.[cat] || []).length;
   });
 
   return {
-    // Completo cuando al menos se ha cubierto lo requerido
     completo: totalSeleccionados >= totalRequeridos && totalRequeridos > 0,
     totalSeleccionados,
     totalRequeridos,
-    totalExtras,
   };
 }
 
@@ -459,16 +558,37 @@ function initEventListeners() {
       return;
     }
 
-    // Toggle de platillo
-    const platilloItem = e.target.closest(".menu-item");
-    if (platilloItem && platilloItem.dataset.platilloId) {
-      // Solo permitir selección si hay reserva habilitada
-      if (!state.reservaActiva) return;
+    // Botones +/− de cantidad
+    const qtyBtn = e.target.closest(".qty-btn");
+    if (qtyBtn && state.reservaActiva) {
+      e.stopPropagation(); // no propagar al menu-item
+      const action = qtyBtn.dataset.action;
+      const platilloId = qtyBtn.dataset.platilloId;
+      const categoria = qtyBtn.dataset.categoria;
+      if (action === "plus") addPlatillo(platilloId, categoria);
+      if (action === "minus") removePlatillo(platilloId, categoria);
+      return;
+    }
 
-      togglePlatillo(
-        platilloItem.dataset.platilloId,
-        platilloItem.dataset.categoria,
-      );
+    // Click en el body del menu-item (añadir si qty=0, ignorar si ya tiene controles)
+    const platilloItem = e.target.closest(".menu-item");
+    if (
+      platilloItem &&
+      platilloItem.dataset.platilloId &&
+      state.reservaActiva
+    ) {
+      const platilloId = platilloItem.dataset.platilloId;
+      const categoria = platilloItem.dataset.categoria;
+      const qty = getQty(state.clienteActivo, categoria, platilloId);
+      // Solo añadir si qty=0 (el primer toque); si ya tiene qty, los botones +/− son los controles
+      if (qty === 0) addPlatillo(platilloId, categoria);
+      return;
+    }
+
+    // Toggle modo compacto
+    if (e.target.closest("#btn-toggle-compacto")) {
+      state.compacto = !state.compacto;
+      render();
       return;
     }
 
@@ -479,26 +599,22 @@ function initEventListeners() {
   });
 }
 
-function togglePlatillo(platilloId, categoriaPlural) {
+// ==========================================================
+// MANIPULACIÓN DE CANTIDADES
+// ==========================================================
+function addPlatillo(platilloId, categoriaPlural) {
   if (!state.menu) return;
+  const esAlaCarta = state.menu.id === "alacarta";
+  const sel = state.seleccionesPorCliente[state.clienteActivo];
+  const arrCat = sel[categoriaPlural];
 
-  const max = state.menu.maxSelecciones[categoriaPlural];
-  if (max === 0) return; // Categoría no incluida en este menú
-
-  const seleccionados =
-    state.seleccionesPorCliente[state.clienteActivo][categoriaPlural];
-  const index = seleccionados.indexOf(platilloId);
-
-  if (index > -1) {
-    // Deseleccionar
-    seleccionados.splice(index, 1);
-  } else {
-    // Seleccionar (sin límite, pero con aviso si supera el máximo)
-    seleccionados.push(platilloId);
-    if (seleccionados.length > max) {
-      const platillo = Object.values(PLATILLOS)
-        .flat()
-        .find((p) => p.id === platilloId);
+  if (!esAlaCarta) {
+    const max = state.menu.maxSelecciones[categoriaPlural];
+    if (max === 0) return; // Categoría no disponible en este menú
+    const totalCat = arrCat.length;
+    // Advertencia si se supera el máximo, pero se permite (es extra con cargo)
+    if (totalCat >= max) {
+      const platillo = getPlatillos().find((p) => p.id === platilloId);
       const precio = platillo ? formatCurrency(platillo.precio) : "";
       showToast(
         `⚠️ Platillo extra — ${precio} se añadirá a tu factura`,
@@ -508,14 +624,45 @@ function togglePlatillo(platilloId, categoriaPlural) {
     }
   }
 
+  arrCat.push(platilloId);
   render();
 }
 
+function removePlatillo(platilloId, categoriaPlural) {
+  if (!state.menu) return;
+  const sel = state.seleccionesPorCliente[state.clienteActivo];
+  const arrCat = sel[categoriaPlural];
+  // Quitar la última ocurrencia del id
+  const lastIdx = arrCat.lastIndexOf(platilloId);
+  if (lastIdx > -1) arrCat.splice(lastIdx, 1);
+  render();
+}
+
+// ==========================================================
+// GUARDAR SELECCIÓN
+// ==========================================================
 async function guardarSeleccion() {
   if (!state.reservaActiva) return;
 
-  if (!completoTodosLosClientes()) {
+  const esAlaCarta = state.menu?.id === "alacarta";
+
+  if (!esAlaCarta && !completoTodosLosClientes()) {
     showToast("Completa la selección de todos los comensales", "warning");
+    return;
+  }
+
+  const totalItems = state.seleccionesPorCliente.reduce((s, sel) => {
+    return (
+      s +
+      ["entradas", "principales", "postres", "bebidas"].reduce(
+        (ss, c) => ss + (sel[c]?.length || 0),
+        0,
+      )
+    );
+  }, 0);
+
+  if (esAlaCarta && totalItems === 0) {
+    showToast("Selecciona al menos un platillo", "warning");
     return;
   }
 

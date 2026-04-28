@@ -196,6 +196,7 @@ function construirHTMLFacturaEmail(reserva) {
     hour: "2-digit",
     minute: "2-digit",
   });
+  const esAlaCarta = menu?.id === "alacarta";
   const maxSel = menu
     ? menu.maxSelecciones
     : { entradas: 0, principales: 0, postres: 0, bebidas: 0 };
@@ -219,7 +220,9 @@ function construirHTMLFacturaEmail(reserva) {
 
   // ── Filas de platillos con lógica incluido/extra ────────────────────
   let subtotalExtras = 0;
+  let subtotalAlaCarta = 0; // ← nueva variable
   let filasHTML = "";
+  const countByCat = { entradas: 0, principales: 0, postres: 0, bebidas: 0 };
 
   (reserva.menuSelectionsByClient || []).forEach((sel, idx) => {
     const nombre =
@@ -238,21 +241,40 @@ function construirHTMLFacturaEmail(reserva) {
 
     cats.forEach((cat) => {
       const ids = sel[cat] || [];
-      const limite = maxSel[cat] || 0;
+      const limite = esAlaCarta ? 0 : maxSel[cat] || 0;
 
-      ids.forEach((id, posEnCat) => {
+      // Agrupar IDs duplicados conservando el orden de posición original
+      // (la posición determina si un platillo es "incluido" o "extra")
+      const grupos = new Map();
+      ids.forEach((id, pos) => {
+        if (!grupos.has(id)) grupos.set(id, { qty: 0, posiciones: [] });
+        const g = grupos.get(id);
+        g.qty++;
+        g.posiciones.push(pos);
+      });
+
+      Array.from(grupos.entries()).forEach(([id, { qty, posiciones }]) => {
         const p = platillos.find((x) => x.id === id);
         if (!p) return;
 
-        const esExtra = posEnCat >= limite;
-        if (esExtra) subtotalExtras += p.precio;
+        const incluidoCount = esAlaCarta
+          ? 0
+          : posiciones.filter((pos) => pos < limite).length;
+        const extraCount = esAlaCarta ? qty : qty - incluidoCount;
 
-        const precioTxt = esExtra
-          ? `<strong style="color:${C.rojo};">${formatCurrency(p.precio)}</strong>`
-          : `<span style="color:${C.verde};font-style:italic;">Incluido</span>`;
-        const extraBadge = esExtra
-          ? `<span style="background:${C.badgeFondo};color:${C.rojo};border:1px solid ${C.badgeBorde};border-radius:3px;font-size:10px;font-weight:700;padding:1px 5px;margin-left:6px;">+EXTRA</span>`
-          : "";
+        // Acumular subtotales por grupo
+        if (esAlaCarta) {
+          subtotalAlaCarta += p.precio * qty;
+        } else {
+          subtotalExtras += p.precio * extraCount;
+        }
+
+        // Badge ×N (solo aparece cuando qty > 1)
+        const qtyBadge =
+          qty > 1
+            ? `<span style="display:inline-flex;align-items:center;justify-content:center;background:${C.dorado};color:${C.oscuro};border-radius:3px;font-size:10px;font-weight:700;padding:1px 7px;margin-left:6px;line-height:1.5;vertical-align:middle;letter-spacing:0.02em;">×${qty}</span>`
+            : "";
+
         const nombreCat =
           cat === "principales"
             ? "Principal"
@@ -262,9 +284,36 @@ function construirHTMLFacturaEmail(reserva) {
                 ? "Entrada"
                 : "Postre";
 
+        let precioTxt;
+        let extraBadge = "";
+
+        if (esAlaCarta) {
+          const total = p.precio * qty;
+          precioTxt =
+            qty > 1
+              ? `<span style="font-size:11px;color:${C.cafe};">${qty}×${formatCurrency(p.precio)} =</span> <strong style="color:${C.rojo};">${formatCurrency(total)}</strong>`
+              : `<strong style="color:${C.rojo};">${formatCurrency(p.precio)}</strong>`;
+        } else if (incluidoCount > 0 && extraCount === 0) {
+          // Todos incluidos en el menú
+          precioTxt = `<span style="color:${C.verde};font-style:italic;">Incluido${qty > 1 ? " ×" + qty : ""}</span>`;
+        } else if (incluidoCount === 0) {
+          // Todos extra
+          const total = p.precio * extraCount;
+          extraBadge = `<span style="background:${C.badgeFondo};color:${C.rojo};border:1px solid ${C.badgeBorde};border-radius:3px;font-size:10px;font-weight:700;padding:1px 5px;margin-left:6px;">+EXTRA</span>`;
+          precioTxt =
+            extraCount > 1
+              ? `<span style="font-size:11px;color:${C.cafe};">${extraCount}×${formatCurrency(p.precio)} =</span> <strong style="color:${C.rojo};">${formatCurrency(total)}</strong>`
+              : `<strong style="color:${C.rojo};">${formatCurrency(p.precio)}</strong>`;
+        } else {
+          // Mixto: algunos incluidos, algunos extra en el mismo platillo
+          const total = p.precio * extraCount;
+          extraBadge = `<span style="background:${C.badgeFondo};color:${C.rojo};border:1px solid ${C.badgeBorde};border-radius:3px;font-size:10px;font-weight:700;padding:1px 5px;margin-left:6px;">+EXTRA</span>`;
+          precioTxt = `<span style="color:${C.verde};font-style:italic;">×${incluidoCount}&nbsp;Incl.</span> <span style="color:${C.gris};">+</span> <strong style="color:${C.rojo};">${extraCount > 1 ? extraCount + "×" + formatCurrency(p.precio) + " = " : ""}${formatCurrency(total)}</strong>`;
+        }
+
         filasHTML += `
         <tr>
-          <td style="padding:9px 12px;border-bottom:1px solid ${C.borde};font-size:13px;">${p.nombre}${extraBadge}</td>
+          <td style="padding:9px 12px;border-bottom:1px solid ${C.borde};font-size:13px;">${p.nombre}${qtyBadge}${extraBadge}</td>
           <td style="padding:9px 12px;border-bottom:1px solid ${C.borde};font-size:12px;color:${C.cafe};font-style:italic;">${nombreCat}</td>
           <td align="right" style="padding:9px 12px;border-bottom:1px solid ${C.borde};font-size:13px;font-weight:600;white-space:nowrap;">${precioTxt}</td>
         </tr>`;
@@ -273,8 +322,8 @@ function construirHTMLFacturaEmail(reserva) {
   });
 
   // ── Totales ──────────────────────────────────────────────────────────
-  const precioBase = menu ? menu.precio * reserva.personas : 0;
-  const subtotal = precioBase + subtotalExtras;
+  const precioBase = esAlaCarta ? 0 : menu ? menu.precio * reserva.personas : 0;
+  const subtotal = esAlaCarta ? subtotalAlaCarta : precioBase + subtotalExtras;
   const iva = +(subtotal * 0.16).toFixed(2);
   const total = +(subtotal + iva).toFixed(2);
 
@@ -358,11 +407,19 @@ function construirHTMLFacturaEmail(reserva) {
               <tr><td style="padding:14px 18px 4px;">
                 <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
                   <tr>
-                    <td align="left"  style="font-size:13px;color:${C.gris};padding:4px 0;">${menu ? menu.nombre : reserva.menu} (${reserva.personas} × ${formatCurrency(menu ? menu.precio : 0)})</td>
-                    <td align="right" style="font-size:13px;color:${C.gris};padding:4px 0;">${formatCurrency(precioBase)}</td>
+                    <td align="left" style="font-size:13px;color:${C.gris};padding:4px 0;">
+                      ${
+                        esAlaCarta
+                          ? `A la Carta — ${reserva.personas} ${reserva.personas === 1 ? "comensal" : "comensales"}`
+                          : `${menu ? menu.nombre : reserva.menu} (${reserva.personas} × ${formatCurrency(menu ? menu.precio : 0)})`
+                      }
+                    </td>
+                    <td align="right" style="font-size:13px;color:${C.gris};padding:4px 0;">
+                      ${formatCurrency(esAlaCarta ? subtotalAlaCarta : precioBase)}
+                    </td>
                   </tr>
                   ${
-                    subtotalExtras > 0
+                    !esAlaCarta && subtotalExtras > 0
                       ? `
                   <tr>
                     <td align="left"  style="font-size:13px;color:${C.rojo};padding:4px 0;">Platillos extra</td>

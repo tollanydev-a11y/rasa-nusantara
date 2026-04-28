@@ -49,6 +49,7 @@ import {
   formatDate,
   getTodayISO,
   traducirEstado,
+  showConfirmModal,
 } from "./main.js";
 import {
   USE_DEMO_MODE,
@@ -374,41 +375,58 @@ async function handleAccionReserva(accion, reservaId) {
   const reserva = state.reservaciones.find((r) => r.id === reservaId);
 
   if (accion === "confirmar") {
-    if (!confirm("¿Confirmar esta reservación?")) return;
-    const ok = await actualizarEstadoReserva(reservaId, "confirmed");
-    if (ok) {
-      // Enviar correo de confirmación al cliente vía EmailJS
-      let correoOk = false;
-      if (reserva) correoOk = await enviarCorreoConfirmacion(reserva);
-      showToast(
-        correoOk
-          ? `Reservación confirmada ✅ · Correo enviado a ${reserva.userEmail} ✉️`
-          : `Reservación confirmada ✅ · No se pudo enviar el correo`,
-        correoOk ? "success" : "warning",
-        4500,
-      );
-      await cargarDatos();
-      renderReservacionesTab();
-      renderDashboard();
-    }
+    showConfirmModal(
+      "Confirmar reservación",
+      `¿Confirmar la reservación de <strong>${reserva?.userName ?? ""}</strong>?`,
+      async () => {
+        const ok = await actualizarEstadoReserva(reservaId, "confirmed");
+        if (ok) {
+          let correoOk = false;
+          if (reserva) correoOk = await enviarCorreoConfirmacion(reserva);
+          showToast(
+            correoOk
+              ? `Reservación confirmada ✅ · Correo enviado a ${reserva.userEmail} ✉️`
+              : `Reservación confirmada ✅ · No se pudo enviar el correo`,
+            correoOk ? "success" : "warning",
+            4500,
+          );
+          await cargarDatos();
+          renderReservacionesTab();
+          renderDashboard();
+        }
+      },
+      { confirmText: "Confirmar" },
+    );
   } else if (accion === "cancelar") {
-    if (!confirm("¿Cancelar esta reservación?")) return;
-    const ok = await actualizarEstadoReserva(reservaId, "cancelled");
-    if (ok) {
-      showToast("Reservación cancelada", "warning");
-      await cargarDatos();
-      renderReservacionesTab();
-      renderDashboard();
-    }
+    showConfirmModal(
+      "Cancelar reservación",
+      `¿Cancelar la reservación de <strong>${reserva?.userName ?? ""}</strong>?`,
+      async () => {
+        const ok = await actualizarEstadoReserva(reservaId, "cancelled");
+        if (ok) {
+          showToast("Reservación cancelada", "warning");
+          await cargarDatos();
+          renderReservacionesTab();
+          renderDashboard();
+        }
+      },
+      { confirmText: "Cancelar reservación", danger: true },
+    );
   } else if (accion === "eliminar") {
-    if (!confirm("¿Eliminar permanentemente esta reservación?")) return;
-    const ok = await eliminarReserva(reservaId);
-    if (ok) {
-      showToast("Reservación eliminada", "success");
-      await cargarDatos();
-      renderReservacionesTab();
-      renderDashboard();
-    }
+    showConfirmModal(
+      "Eliminar reservación",
+      "¿Eliminar permanentemente esta reservación? Esta acción no se puede deshacer.",
+      async () => {
+        const ok = await eliminarReserva(reservaId);
+        if (ok) {
+          showToast("Reservación eliminada", "success");
+          await cargarDatos();
+          renderReservacionesTab();
+          renderDashboard();
+        }
+      },
+      { confirmText: "Eliminar", danger: true },
+    );
   } else if (accion === "toggle-menu") {
     const nuevoEstado = await toggleMenuSelectionEnabled(reservaId);
     if (nuevoEstado === true) {
@@ -749,37 +767,52 @@ function renderMesasTab() {
   container.querySelectorAll("[data-toggle-mesa]").forEach((btn) => {
     btn.addEventListener("click", async () => {
       const mesaId = btn.dataset.toggleMesa;
-      const estadoAdmin = estadoMesas[mesaId] || "available";
-      const estadoEfectivo = esMesaEfectivamenteOcupada(mesaId)
-        ? "occupied"
-        : "available";
       const mesa = todasLasMesas.find((m) => m.id === mesaId);
-      const reservaActiva = reservaProximaPorMesa(mesaId);
 
-      if (estadoEfectivo === "occupied") {
-        if (
-          !confirm(
-            `¿LIBERAR MESA ${mesa.numero}?\nSE ELIMINARÁN LOS PEDIDOS ASOCIADOS.`,
-          )
-        )
-          return;
-        await limpiarPedidosDeLaMesa(mesaId);
-        if (reservaActiva && reservaActiva.menuSelectionEnabled) {
-          await toggleMenuSelectionEnabled(reservaActiva.id);
-        }
-        if (estadoAdmin === "occupied") {
-          await toggleEstadoMesa(mesaId);
-        }
-        showToast(`Mesa ${mesa.numero}: liberada ✅`, "success", 3500);
+      // Re-leer el estado fresco en cada clic para evitar stale closure
+      const estadoActual = getEstadoMesas();
+      const estadoAdmin = estadoActual[mesaId] || "available";
+
+      // Buscar directamente la reserva que tiene menuSelectionEnabled activo
+      // (no solo la "próxima" — puede ser cualquier reserva de esta mesa)
+      const reservaConMenuActivo = state.reservaciones.find(
+        (r) =>
+          r.mesa === mesaId &&
+          r.estado !== "cancelled" &&
+          r.menuSelectionEnabled === true,
+      );
+
+      const estaOcupada =
+        estadoAdmin === "occupied" || reservaConMenuActivo !== undefined;
+
+      if (estaOcupada) {
+        showConfirmModal(
+          `Liberar Mesa ${mesa.numero}`,
+          "¿Liberar esta mesa? Se eliminarán los pedidos asociados.",
+          async () => {
+            await limpiarPedidosDeLaMesa(mesaId);
+            if (reservaConMenuActivo) {
+              await toggleMenuSelectionEnabled(reservaConMenuActivo.id);
+            }
+            if (estadoAdmin === "occupied") {
+              await toggleEstadoMesa(mesaId);
+            }
+            showToast(`Mesa ${mesa.numero}: liberada ✅`, "success", 3500);
+            await cargarDatos();
+            renderMesasTab();
+            renderPedidosTab();
+            renderReservacionesTab();
+          },
+          { confirmText: "Liberar Mesa", danger: true },
+        );
       } else {
         await toggleEstadoMesa(mesaId);
         showToast(`Mesa ${mesa.numero}: ocupada 🔴`, "success", 3500);
+        await cargarDatos();
+        renderMesasTab();
+        renderPedidosTab();
+        renderReservacionesTab();
       }
-
-      await cargarDatos();
-      renderMesasTab();
-      renderPedidosTab();
-      renderReservacionesTab();
     });
   });
 }
@@ -887,16 +920,22 @@ function renderMenuTab() {
   });
 
   container.querySelectorAll("[data-delete-platillo]").forEach((btn) => {
-    btn.addEventListener("click", async () => {
-      if (!confirm("¿Eliminar este platillo permanentemente?")) return;
+    btn.addEventListener("click", () => {
       const id = btn.dataset.deletePlatillo;
-      const ok = await deletePlatillo(id);
-      if (ok) {
-        showToast("Platillo eliminado", "success");
-        renderMenuTab();
-      } else {
-        showToast("Error al eliminar el platillo", "error");
-      }
+      showConfirmModal(
+        "Eliminar platillo",
+        "¿Eliminar permanentemente este platillo del catálogo?",
+        async () => {
+          const ok = await deletePlatillo(id);
+          if (ok) {
+            showToast("Platillo eliminado", "success");
+            renderMenuTab();
+          } else {
+            showToast("Error al eliminar el platillo", "error");
+          }
+        },
+        { confirmText: "Eliminar", danger: true },
+      );
     });
   });
 }
@@ -1228,29 +1267,27 @@ function renderPedidosTab() {
             (s.bebidas || []).length >
           0,
       ) &&
-      r.estado !== "cancelled",
+      r.estado !== "cancelled" &&
+      r.estado !== "pasada",
   );
 
   let html = `
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
-            <h3><i class="fa-solid fa-receipt"></i> Pedidos realizados</h3>
-            <span class="stat-chip stat-chip--ok">
-                📋 ${reservasConPedidos.length} ${reservasConPedidos.length === 1 ? "pedido activo" : "pedidos activos"}
-            </span>
-        </div>
-    `;
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:15px;">
+      <h3><i class="fa-solid fa-receipt"></i> Pedidos realizados</h3>
+      <span class="stat-chip stat-chip--ok">
+        📋 ${reservasConPedidos.length} ${reservasConPedidos.length === 1 ? "pedido activo" : "pedidos activos"}
+      </span>
+    </div>`;
 
   if (reservasConPedidos.length === 0) {
     html += `
-            <div class="form-alert info show" style="text-align: center; padding: 40px 20px;">
-                <i class="fa-solid fa-utensils" style="font-size: 2rem; color: var(--color-secondary); display: block; margin-bottom: 10px;"></i>
-                <p style="margin: 0;">
-                    No hay pedidos activos. Los pedidos aparecen cuando los clientes
-                    seleccionan sus platillos desde la sección <strong>Menú</strong>
-                    (con el menú previamente habilitado por el admin).
-                </p>
-            </div>
-        `;
+      <div class="form-alert info show" style="text-align:center;padding:40px 20px;">
+        <i class="fa-solid fa-utensils" style="font-size:2rem;color:var(--color-secondary);display:block;margin-bottom:10px;"></i>
+        <p style="margin:0;">
+          No hay pedidos activos. Los pedidos aparecen cuando los clientes seleccionan
+          sus platillos desde la sección <strong>Menú</strong> (con el menú habilitado por el admin).
+        </p>
+      </div>`;
     container.innerHTML = html;
     return;
   }
@@ -1259,6 +1296,8 @@ function renderPedidosTab() {
     const area = AREAS.find((a) => a.id === r.area);
     const menu = MENUS[r.menu];
 
+    // ── Construir HTML por cliente (igual que antes) ─────────────────────
+    // ── Construir HTML por cliente (agrupando platillos duplicados) ──────
     const clientesHTML = r.menuSelectionsByClient
       .map((sel, idx) => {
         const total =
@@ -1267,149 +1306,301 @@ function renderPedidosTab() {
           (sel.postres || []).length +
           (sel.bebidas || []).length;
         if (total === 0) return "";
-
         const nombreCliente =
-          r.personasNombres &&
-          r.personasNombres[idx] &&
-          r.personasNombres[idx].trim()
-            ? r.personasNombres[idx].trim()
-            : `Cliente ${idx + 1}`;
+          r.personasNombres?.[idx]?.trim() || `Cliente ${idx + 1}`;
 
-        const renderPlatillo = (platilloId, categoria) => {
-          const p = platillos.find((x) => x.id === platilloId);
-          if (!p) return "";
-          return `
-                    <div class="menu-admin-card">
-                        ${renderAdminDishThumb(p)}
-                        <div class="menu-admin-info">
-                            <strong>${p.nombre}</strong>
-                            <span class="origin">${p.origen}</span>
-                            <span class="meta">${formatCurrency(p.precio)} · ${categoria}</span>
-                        </div>
-                        <div class="pedido-item-delete">
-                            <button class="btn-icon danger"
-                                    data-pedido-eliminar
-                                    data-reserva-id="${r.id}"
-                                    data-cliente-index="${idx}"
-                                    data-categoria="${categoria}"
-                                    data-platillo-id="${platilloId}"
-                                    title="Eliminar este platillo del pedido">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                `;
+        // Agrupa los IDs de una categoría y renderiza una card por platillo único
+        const renderCategoria = (ids, categoria) => {
+          const grupos = new Map();
+          ids.forEach((id) => grupos.set(id, (grupos.get(id) || 0) + 1));
+
+          return Array.from(grupos.entries())
+            .map(([platilloId, qty]) => {
+              const p = platillos.find((x) => x.id === platilloId);
+              if (!p) return "";
+
+              const qtyBadge =
+                qty > 1
+                  ? `<span class="menu-admin-qty-badge">×${qty}</span>`
+                  : "";
+
+              const precioLabel =
+                qty > 1
+                  ? `${qty}×${formatCurrency(p.precio)} = ${formatCurrency(p.precio * qty)}`
+                  : formatCurrency(p.precio);
+
+              return `
+              <div class="menu-admin-card">
+                ${renderAdminDishThumb(p)}
+                <div class="menu-admin-info">
+                  <strong>${p.nombre}${qtyBadge}</strong>
+                  <span class="origin">${p.origen}</span>
+                  <span class="meta">${precioLabel} · ${categoria}</span>
+                </div>
+                <div class="pedido-item-delete">
+                  <button class="btn-icon danger"
+                          data-pedido-eliminar
+                          data-reserva-id="${r.id}"
+                          data-cliente-index="${idx}"
+                          data-categoria="${categoria}"
+                          data-platillo-id="${platilloId}"
+                          title="${qty > 1 ? `Quitar uno (quedarán ${qty - 1})` : "Eliminar del pedido"}">
+                    <i class="fa-solid fa-${qty > 1 ? "minus" : "trash"}"></i>
+                  </button>
+                </div>
+              </div>`;
+            })
+            .join("");
         };
 
-        const entradasHTML = (sel.entradas || [])
-          .map((id) => renderPlatillo(id, "entradas"))
-          .join("");
-        const principalesHTML = (sel.principales || [])
-          .map((id) => renderPlatillo(id, "principales"))
-          .join("");
-        const postresHTML = (sel.postres || [])
-          .map((id) => renderPlatillo(id, "postres"))
-          .join("");
-        const bebidasHTML = (sel.bebidas || [])
-          .map((id) => renderPlatillo(id, "bebidas"))
-          .join("");
-
         return `
-                <div class="pedido-cliente-block">
-                    <h5 class="pedido-cliente-title">
-                        <span class="pedido-cliente-badge">${idx + 1}</span>
-                        ${nombreCliente}
-                        <span class="pedido-cliente-count">(${total} platillos)</span>
-                    </h5>
-                    <div class="menu-admin-grid">
-                        ${entradasHTML}
-                        ${principalesHTML}
-                        ${postresHTML}
-                        ${bebidasHTML}
-                    </div>
-                </div>
-            `;
+          <div class="pedido-cliente-block">
+            <h5 class="pedido-cliente-title">
+              <span class="pedido-cliente-badge">${idx + 1}</span>
+              ${nombreCliente}
+              <span class="pedido-cliente-count">(${total} platillos)</span>
+            </h5>
+            <div class="menu-admin-grid">
+              ${renderCategoria(sel.entradas || [], "entradas")}
+              ${renderCategoria(sel.principales || [], "principales")}
+              ${renderCategoria(sel.postres || [], "postres")}
+              ${renderCategoria(sel.bebidas || [], "bebidas")}
+            </div>
+          </div>`;
       })
       .filter(Boolean)
       .join("");
 
+    // ── Cálculo de precios para el resumen colapsado ──────────────────────
+    // ── Cálculo de precios para el resumen colapsado ──────────────────────
+    const esAlaCarta = menu?.id === "alacarta";
+    const maxSel = menu
+      ? menu.maxSelecciones
+      : { entradas: 0, principales: 0, postres: 0, bebidas: 0 };
+    let subtotalExtras = 0;
+    let subtotalAlaCarta = 0;
+    let totalPlatillosCount = 0;
+    const countByCat = { entradas: 0, principales: 0, postres: 0, bebidas: 0 };
+
+    (r.menuSelectionsByClient || []).forEach((sel) => {
+      ["entradas", "principales", "postres", "bebidas"].forEach((cat) => {
+        const ids = sel[cat] || [];
+        ids.forEach((id, pos) => {
+          totalPlatillosCount++;
+          countByCat[cat]++;
+          const p = platillos.find((x) => x.id === id);
+          if (!p) return;
+          if (esAlaCarta) {
+            subtotalAlaCarta += p.precio;
+          } else if (pos >= (maxSel[cat] || 0)) {
+            subtotalExtras += p.precio;
+          }
+        });
+      });
+    });
+    const precioBase = esAlaCarta
+      ? 0
+      : menu && menu.precio > 0
+        ? menu.precio * r.personas
+        : 0;
+    const subtotal = esAlaCarta
+      ? subtotalAlaCarta
+      : precioBase + subtotalExtras;
+    const iva = +(subtotal * 0.16).toFixed(2);
+    const totalFactura = +(subtotal + iva).toFixed(2);
+
+    const resumenHTML = `
+      <div class="pedido-precio-resumen">
+        <span class="pedido-precio-item">
+          <i class="fa-solid fa-utensils" style="color:var(--color-secondary);"></i>
+          <span>${totalPlatillosCount} platillos · ${r.personas} pax</span>
+        </span>
+        ${
+          !esAlaCarta && subtotalExtras > 0
+            ? `
+        <span class="pedido-precio-item">
+          <i class="fa-solid fa-circle-exclamation" style="color:var(--color-primary);"></i>
+          <span>Extras: <strong>${formatCurrency(subtotalExtras)}</strong></span>
+        </span>`
+            : ""
+        }
+        <span class="pedido-precio-item">
+          <i class="fa-solid fa-percent" style="color:var(--color-text-light);"></i>
+          <span>IVA (16%): ${formatCurrency(iva)}</span>
+        </span>
+        <span class="pedido-precio-total">${formatCurrency(totalFactura)}</span>
+      </div>`;
+
     html += `
-            <div class="pedido-reserva-card">
-                <div class="pedido-reserva-header">
-                    <div>
-                        <h4>
-                            <i class="fa-solid fa-user-circle"></i>
-                            ${r.userName}
-                        </h4>
-                        <p class="pedido-reserva-meta">
-                            <i class="fa-solid fa-calendar"></i> ${formatDate(r.fecha)}
-                            · <i class="fa-solid fa-clock"></i> ${r.hora}
-                            · <i class="fa-solid fa-users"></i> ${r.personas} pax
-                            · ${area ? area.nombre : r.area}
-                            · Mesa #${r.mesa.split("-m")[1]}
-                        </p>
-                        <p class="pedido-reserva-meta">
-                            <i class="fa-solid fa-utensils"></i> ${menu ? menu.nombre : r.menu}
-                            · <strong>${formatCurrency(r.total)}</strong>
-                            · ${r.userEmail}
-                        </p>
-                    </div>
-                    <span class="status-badge ${r.estado}">${traducirEstado(r.estado)}</span>
-                </div>
-                <div class="pedido-reserva-body">
-                    ${clientesHTML}
-                    <div class="pedido-reserva-actions">
-                        <button class="btn btn-primary btn-finalizar-pedido"
-                                data-pedido-finalizar
-                                data-reserva-id="${r.id}">
-                            <i class="fa-solid fa-file-invoice-dollar"></i>
-                            Finalizar pedido y generar factura
-                        </button>
-                    </div>
-                </div>
-            </div>
-        `;
+      <div class="pedido-reserva-card" data-reserva-card="${r.id}">
+        <div class="pedido-reserva-header">
+          <div>
+            <h4>
+              <i class="fa-solid fa-user-circle"></i>
+              ${r.userName}
+            </h4>
+            <p class="pedido-reserva-meta">
+              <i class="fa-solid fa-calendar"></i> ${formatDate(r.fecha)}
+              · <i class="fa-solid fa-clock"></i> ${r.hora}
+              · <i class="fa-solid fa-users"></i> ${r.personas} pax
+              · ${area ? area.nombre : r.area}
+              · Mesa #${r.mesa.split("-m")[1]}
+            </p>
+            <p class="pedido-reserva-meta">
+              <i class="fa-solid fa-utensils"></i> ${menu ? menu.nombre : r.menu}
+              · <strong>${formatCurrency(r.total)}</strong>
+              · ${r.userEmail}
+            </p>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+            <span class="status-badge ${r.estado}">${traducirEstado(r.estado)}</span>
+            <button class="pedido-collapse-btn" data-collapse-id="${r.id}">
+              <i class="fa-solid fa-chevron-down chevron"></i>
+              <span class="collapse-label">Colapsar</span>
+            </button>
+          </div>
+        </div>
+        ${resumenHTML}
+        <div class="pedido-reserva-body">
+          ${clientesHTML}
+          <div class="pedido-reserva-actions">
+            <button class="btn btn-primary btn-finalizar-pedido"
+                    data-pedido-finalizar
+                    data-reserva-id="${r.id}">
+              <i class="fa-solid fa-paper-plane"></i>
+              Finalizar pedido
+            </button>
+          </div>
+        </div>
+      </div>`;
   });
 
   container.innerHTML = html;
 
-  container.querySelectorAll("[data-pedido-eliminar]").forEach((btn) => {
-    btn.addEventListener("click", async () => {
-      if (!confirm("¿Eliminar este platillo del pedido?")) return;
+  // ── Colapsar / expandir ───────────────────────────────────────────────
+  container.querySelectorAll("[data-collapse-id]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const card = container.querySelector(
+        `[data-reserva-card="${btn.dataset.collapseId}"]`,
+      );
+      if (!card) return;
+      card.classList.toggle("collapsed");
+      const label = btn.querySelector(".collapse-label");
+      const chevron = btn.querySelector(".chevron");
+      const collapsed = card.classList.contains("collapsed");
+      if (label) label.textContent = collapsed ? "Expandir" : "Colapsar";
+    });
+  });
 
+  // ── Eliminar platillo del pedido ──────────────────────────────────────
+  container.querySelectorAll("[data-pedido-eliminar]").forEach((btn) => {
+    btn.addEventListener("click", () => {
       const reservaId = btn.dataset.reservaId;
       const clienteIdx = parseInt(btn.dataset.clienteIndex);
       const categoria = btn.dataset.categoria;
       const platilloId = btn.dataset.platilloId;
+      const p = getPlatillos().find((x) => x.id === platilloId);
+      showConfirmModal(
+        "Eliminar platillo del pedido",
+        `¿Eliminar <strong>${p?.nombre || "este platillo"}</strong> del pedido?`,
+        async () => {
+          const reserva = state.reservaciones.find((x) => x.id === reservaId);
+          if (!reserva?.menuSelectionsByClient) return;
+          const copia = JSON.parse(
+            JSON.stringify(reserva.menuSelectionsByClient),
+          );
+          if (copia[clienteIdx]?.[categoria]) {
+            // Quitar solo UNA ocurrencia (por si hay qty > 1)
+            const idx = copia[clienteIdx][categoria].indexOf(platilloId);
+            if (idx > -1) copia[clienteIdx][categoria].splice(idx, 1);
+          }
+          const ok = await actualizarSeleccionMenu(reservaId, copia);
+          if (ok) {
+            showToast("Platillo eliminado del pedido", "info");
+            await cargarDatos();
+            renderPedidosTab();
+          } else {
+            showToast("Error al eliminar el platillo", "error");
+          }
+        },
+        { confirmText: "Eliminar", danger: true },
+      );
+    });
+  });
 
+  // ── Finalizar pedido → enviar factura + marcar como pasada ────────────
+  container.querySelectorAll("[data-pedido-finalizar]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const reservaId = btn.dataset.reservaId;
       const reserva = state.reservaciones.find((x) => x.id === reservaId);
-      if (!reserva || !reserva.menuSelectionsByClient) return;
+      if (!reserva) return;
 
-      const copia = JSON.parse(JSON.stringify(reserva.menuSelectionsByClient));
-      if (copia[clienteIdx] && Array.isArray(copia[clienteIdx][categoria])) {
-        copia[clienteIdx][categoria] = copia[clienteIdx][categoria].filter(
-          (id) => id !== platilloId,
+      btn.disabled = true;
+      const textoOrig = btn.innerHTML;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enviando...';
+
+      // 1. Calcular el total real con IVA
+      const totalReal = calcularTotalReserva(reserva);
+      // 2. Enviar factura por correo
+      const enviado = await enviarFacturaPorCorreo(reserva);
+      // 3. Cambiar estado a "pasada" y persistir el total correcto en Firestore
+      await actualizarEstadoReserva(reservaId, "pasada", { total: totalReal });
+
+      if (enviado) {
+        showToast(`Factura enviada a ${reserva.userEmail} ✉️`, "success", 4500);
+      } else {
+        showToast(
+          "No se pudo enviar la factura. Revisa la configuración de EmailJS.",
+          "error",
+          5000,
         );
       }
 
-      const ok = await actualizarSeleccionMenu(reservaId, copia);
-      if (ok) {
-        showToast("Platillo eliminado del pedido", "info");
-        await cargarDatos();
-        renderPedidosTab();
-      } else {
-        showToast("Error al eliminar el platillo", "error");
-      }
+      btn.disabled = false;
+      btn.innerHTML = textoOrig;
+      await cargarDatos();
+      renderPedidosTab();
     });
   });
+}
 
-  container.querySelectorAll("[data-pedido-finalizar]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const reservaId = btn.dataset.reservaId;
-      const reserva = state.reservaciones.find((x) => x.id === reservaId);
-      if (reserva) abrirModalFactura(reserva);
+function calcularTotalReserva(reserva) {
+  const menu = MENUS[reserva.menu];
+  const esAlaCarta = menu?.id === "alacarta";
+  const platillosList = getPlatillos();
+
+  let subtotal = 0;
+
+  if (esAlaCarta) {
+    // Suma el precio individual de cada platillo elegido
+    (reserva.menuSelectionsByClient || []).forEach((sel) => {
+      ["entradas", "principales", "postres", "bebidas"].forEach((cat) => {
+        (sel[cat] || []).forEach((id) => {
+          const p = platillosList.find((x) => x.id === id);
+          if (p) subtotal += p.precio;
+        });
+      });
     });
-  });
+  } else {
+    // Menú fijo: precio base + platillos extra (por encima del límite)
+    const maxSel = menu
+      ? menu.maxSelecciones
+      : { entradas: 0, principales: 0, postres: 0, bebidas: 0 };
+    subtotal = menu ? menu.precio * reserva.personas : 0;
+    (reserva.menuSelectionsByClient || []).forEach((sel) => {
+      ["entradas", "principales", "postres", "bebidas"].forEach((cat) => {
+        (sel[cat] || []).forEach((id, pos) => {
+          if (pos >= (maxSel[cat] || 0)) {
+            const p = platillosList.find((x) => x.id === id);
+            if (p) subtotal += p.precio;
+          }
+        });
+      });
+    });
+  }
+
+  // Aplicar IVA y redondear a dos decimales
+  return +(subtotal * 1.16).toFixed(2);
 }
 
 // ==========================================================
@@ -1422,6 +1613,7 @@ async function limpiarPedidosDeLaMesa(mesaId) {
     (r) =>
       r.mesa === mesaId &&
       r.estado !== "cancelled" &&
+      r.estado !== "pasada" &&
       r.menuSelectionsByClient &&
       Array.isArray(r.menuSelectionsByClient) &&
       r.menuSelectionsByClient.some(
@@ -1440,297 +1632,4 @@ async function limpiarPedidosDeLaMesa(mesaId) {
     await actualizarSeleccionMenu(reserva.id, null);
   }
   return true;
-}
-
-function construirHTMLFactura(reserva) {
-  const area = AREAS.find((a) => a.id === reserva.area);
-  const menu = MENUS[reserva.menu];
-  const platillos = getPlatillos();
-
-  const hoy = new Date();
-  const nn = (n, d) => String(n).padStart(d, "0");
-  const numeroFactura = `RN-${String(hoy.getFullYear()).slice(-2)}${nn(hoy.getMonth() + 1, 2)}${nn(hoy.getDate(), 2)}-${reserva.id.slice(-5).toUpperCase()}`;
-  const fechaEmision = hoy.toLocaleString("es-MX", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-  const maxSel = menu
-    ? menu.maxSelecciones
-    : { entradas: 0, principales: 0, postres: 0, bebidas: 0 };
-
-  // ── Construir filas con lógica incluido / extra ─────────────────────────
-  let subtotalExtras = 0;
-  let filasHTML = "";
-
-  (reserva.menuSelectionsByClient || []).forEach((sel, idx) => {
-    const nombre =
-      reserva.personasNombres?.[idx]?.trim() || `Cliente ${idx + 1}`;
-    const cats = ["entradas", "principales", "postres", "bebidas"];
-    const totalPlatillos = cats.reduce((s, c) => s + (sel[c] || []).length, 0);
-    if (totalPlatillos === 0) return;
-
-    // Cabecera de comensal
-    filasHTML += `
-      <tr>
-        <td colspan="3" style="background:#FFF8ED;color:#C1272D;font-size:0.82rem;font-weight:700;
-             border-top:2px solid #D4AF37;padding:8px 12px;">
-          ${idx + 1}. ${nombre}
-          <span style="color:#8B5A2B;font-weight:400;margin-left:8px;">(${totalPlatillos} platillos)</span>
-        </td>
-      </tr>`;
-
-    cats.forEach((cat) => {
-      const ids = sel[cat] || [];
-      const limite = maxSel[cat] || 0;
-
-      ids.forEach((id, posEnCat) => {
-        const p = platillos.find((x) => x.id === id);
-        if (!p) return;
-
-        const esExtra = posEnCat >= limite;
-        if (esExtra) subtotalExtras += p.precio;
-
-        const precioTxt = esExtra
-          ? `<strong style="color:#C1272D;">${formatCurrency(p.precio)}</strong>`
-          : `<span style="color:#4CAF50;font-style:italic;">Incluido</span>`;
-        const extraBadge = esExtra
-          ? `<span style="background:#FFF0F0;color:#C1272D;border:1px solid #F8BBD0;
-                  border-radius:3px;font-size:0.68rem;font-weight:700;padding:1px 5px;
-                  margin-left:6px;vertical-align:middle;">+EXTRA</span>`
-          : "";
-
-        const nombreCat =
-          cat === "principales"
-            ? "Principal"
-            : cat === "bebidas"
-              ? "Bebida"
-              : cat === "entradas"
-                ? "Entrada"
-                : "Postre";
-
-        filasHTML += `
-          <tr>
-            <td style="padding:9px 12px;border-bottom:1px solid #EEE;font-size:0.88rem;">
-              ${renderAdminDishThumb(p)} ${p.nombre}${extraBadge}
-            </td>
-            <td style="padding:9px 12px;border-bottom:1px solid #EEE;font-size:0.78rem;
-                 color:#8B5A2B;font-style:italic;">${nombreCat}</td>
-            <td style="padding:9px 12px;border-bottom:1px solid #EEE;font-size:0.88rem;
-                 text-align:right;font-weight:600;white-space:nowrap;">${precioTxt}</td>
-          </tr>`;
-      });
-    });
-  });
-
-  // ── Totales ──────────────────────────────────────────────────────────────
-  const precioBase = menu ? menu.precio * reserva.personas : 0;
-  const subtotal = precioBase + subtotalExtras;
-  const iva = +(subtotal * 0.16).toFixed(2);
-  const total = +(subtotal + iva).toFixed(2);
-
-  const c = {
-    rojo: "#C1272D",
-    dorado: "#D4AF37",
-    oscuro: "#2C1810",
-    cafe: "#8B5A2B",
-    fondo: "#FAF3E7",
-    fondo2: "#FFF8ED",
-    gris: "#555",
-    grisClaro: "#999",
-  };
-
-  return /* html */ `
-<div style="font-family:'Poppins',Arial,sans-serif;max-width:720px;margin:0 auto;
-     background:#FFFFFF;color:${c.oscuro};border-radius:8px;
-     box-shadow:0 4px 18px rgba(0,0,0,0.08);">
-
-  <!-- ENCABEZADO -->
-  <div style="background:linear-gradient(135deg,${c.rojo} 0%,#8B0000 100%);
-       padding:28px 32px;border-radius:8px 8px 0 0;display:flex;
-       justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
-    <div style="display: flex; align-items: center; gap: 12px; color: #ffffff;">
-      <div style="width: 45px;height: 45px; background: ${c.dorado}; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center; font-size: 1.5rem; overflow: hidden;flex-shrink: 0;"><img src="img/logo.png" alt="Rasa Nusantara" style="width: 100%; height: 100%; object-fit: cover; display: block;" /></div>
-      <div display: flex; flex-direction: column; line-height: 1.1;>
-        <span style="font-family: 'Playfair Display', serif; font-size: 1.3rem; color: ${c.dorado};font-weight: 700; letter-spacing: 1px;">Rasa Nusantara</span>
-        <span style="font-family: 'Dancing Script', cursive; font-size: 0.85rem; color: #ffffff;">Sabor del archipiélago</span>
-      </div>
-    </div>
-    <div style="text-align:right;">
-      <p style="margin:0;font-size:0.65rem;text-transform:uppercase;letter-spacing:0.15em;
-           color:${c.dorado};font-weight:700;">Factura</p>
-      <p style="margin:3px 0 4px;font-family:'Playfair Display',serif;font-size:1.1rem;
-           color:#FFFFFF;font-weight:700;">${numeroFactura}</p>
-      <p style="margin:0;font-size:0.76rem;color:rgba(255,255,255,0.75);">${fechaEmision}</p>
-    </div>
-  </div>
-
-  <!-- PARTES -->
-  <div style="display:flex;gap:20px;flex-wrap:wrap;background:${c.fondo};
-       border-left:4px solid ${c.dorado};padding:16px 22px;margin:0;">
-    <div style="flex:1;min-width:200px;">
-      <p style="margin:0 0 6px;font-size:0.65rem;text-transform:uppercase;
-           letter-spacing:0.12em;color:${c.cafe};font-weight:700;">Facturar a</p>
-      <p style="margin:0 0 3px;font-family:'Playfair Display',serif;font-size:1rem;
-           color:${c.oscuro};font-weight:700;">${reserva.userName}</p>
-      <p style="margin:2px 0;font-size:0.82rem;color:${c.gris};">${reserva.userEmail}</p>
-      ${reserva.telefono ? `<p style="margin:2px 0;font-size:0.82rem;color:${c.gris};">Tel: ${reserva.telefono}</p>` : ""}
-    </div>
-    <div style="flex:1;min-width:200px;">
-      <p style="margin:0 0 6px;font-size:0.65rem;text-transform:uppercase;
-           letter-spacing:0.12em;color:${c.cafe};font-weight:700;">Reservación</p>
-      <p style="margin:2px 0;font-size:0.88rem;color:${c.oscuro};">
-        <strong>${formatDate(reserva.fecha)}</strong> · ${reserva.hora}</p>
-      <p style="margin:2px 0;font-size:0.82rem;color:${c.gris};">
-        ${area ? area.nombre : reserva.area} · Mesa #${reserva.mesa.split("-m")[1]}</p>
-      <p style="margin:2px 0;font-size:0.82rem;color:${c.gris};">
-        ${reserva.personas} ${reserva.personas === 1 ? "comensal" : "comensales"} · ${menu ? menu.nombre : reserva.menu}</p>
-    </div>
-  </div>
-
-  <!-- TABLA DE PLATILLOS -->
-  <div style="padding:0 22px;">
-    <table style="width:100%;border-collapse:collapse;margin:16px 0;">
-      <thead>
-        <tr>
-          <th style="background:${c.oscuro};color:${c.dorado};padding:10px 12px;
-               text-align:left;font-size:0.72rem;text-transform:uppercase;
-               letter-spacing:0.08em;font-weight:700;">Platillo</th>
-          <th style="background:${c.oscuro};color:${c.dorado};padding:10px 12px;
-               text-align:left;font-size:0.72rem;text-transform:uppercase;
-               letter-spacing:0.08em;font-weight:700;">Categoría</th>
-          <th style="background:${c.oscuro};color:${c.dorado};padding:10px 12px;
-               text-align:right;font-size:0.72rem;text-transform:uppercase;
-               letter-spacing:0.08em;font-weight:700;">Precio</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${
-          filasHTML ||
-          `<tr><td colspan="3" style="padding:20px;text-align:center;
-             color:${c.grisClaro};font-size:0.9rem;">Sin platillos en el pedido</td></tr>`
-        }
-      </tbody>
-    </table>
-  </div>
-
-  <!-- RESUMEN DE PRECIOS -->
-  <div style="margin:0 22px 20px;padding:14px 18px;background:${c.fondo};border-radius:6px;">
-    <div style="display:flex;justify-content:space-between;padding:4px 0;
-         font-size:0.88rem;color:${c.gris};">
-      <span>${menu ? menu.nombre : reserva.menu} (${reserva.personas} × ${formatCurrency(menu ? menu.precio : 0)})</span>
-      <span>${formatCurrency(precioBase)}</span>
-    </div>
-    ${
-      subtotalExtras > 0
-        ? `
-    <div style="display:flex;justify-content:space-between;padding:4px 0;
-         font-size:0.88rem;color:${c.rojo};">
-      <span>Platillos extra</span>
-      <span>${formatCurrency(subtotalExtras)}</span>
-    </div>`
-        : ""
-    }
-    <div style="display:flex;justify-content:space-between;padding:4px 0;
-         font-size:0.88rem;color:${c.gris};">
-      <span>IVA (16%)</span>
-      <span>${formatCurrency(iva)}</span>
-    </div>
-    <div style="display:flex;justify-content:space-between;padding:10px 0 4px;
-         border-top:2px solid ${c.oscuro};margin-top:6px;
-         font-family:'Playfair Display',serif;font-size:1.2rem;
-         color:${c.rojo};font-weight:700;">
-      <span>TOTAL</span>
-      <span>${formatCurrency(total)}</span>
-    </div>
-  </div>
-
-  <!-- FOOTER -->
-  <div style="text-align:center;padding:18px 22px 24px;
-       border-top:1px dashed ${c.dorado};background:${c.fondo2};
-       border-radius:0 0 8px 8px;">
-    <p style="margin:0;font-family:'Playfair Display',serif;font-size:1.1rem;
-         color:${c.rojo};font-weight:700;">¡Gracias por tu visita!</p>
-    <p style="margin:4px 0 12px;font-size:1.4rem;color:${c.cafe};">Terima Kasih 🙏</p>
-    <p style="margin:0;font-size:0.7rem;color:${c.grisClaro};line-height:1.5;">
-      Rasa Nusantara · hola@rasanusantara.mx<br>
-      Esta factura es un comprobante informativo generado automáticamente.
-    </p>
-  </div>
-</div>`;
-}
-
-// Abre el modal con la previsualización de la factura.
-function abrirModalFactura(reserva) {
-  // Eliminar modal previo si existe
-  const modalPrev = document.getElementById("invoice-modal");
-  if (modalPrev) modalPrev.remove();
-
-  const facturaHTML = construirHTMLFactura(reserva);
-
-  const modal = document.createElement("div");
-  modal.id = "invoice-modal";
-  modal.className = "invoice-modal";
-  modal.innerHTML = `
-    <div class="invoice-modal-backdrop" data-close-modal></div>
-    <div class="invoice-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="invoice-modal-title">
-        <div class="invoice-modal-topbar">
-            <h3 id="invoice-modal-title"><i class="fa-solid fa-file-invoice-dollar"></i> Previsualización de factura</h3>
-            <button class="invoice-modal-close" data-close-modal aria-label="Cerrar">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
-        <div class="invoice-modal-body" id="invoice-modal-body">
-            ${facturaHTML}
-        </div>
-        <div class="invoice-modal-actions">
-            <button class="btn btn-outline" data-close-modal>
-                <i class="fa-solid fa-check"></i> Confirmar
-            </button>
-            <button class="btn btn-primary" id="btn-enviar-factura">
-                <i class="fa-solid fa-paper-plane"></i> Enviar por correo
-            </button>
-        </div>
-    </div>
-  `;
-
-  document.body.appendChild(modal);
-  document.body.classList.add("modal-open");
-
-  // Listener único para cerrar
-  const cerrar = () => {
-    modal.remove();
-    document.body.classList.remove("modal-open");
-  };
-  modal.querySelectorAll("[data-close-modal]").forEach((el) => {
-    el.addEventListener("click", cerrar);
-  });
-
-  // Enviar por correo
-  modal
-    .querySelector("#btn-enviar-factura")
-    .addEventListener("click", async (e) => {
-      const btn = e.currentTarget;
-      btn.disabled = true;
-      const textoOriginal = btn.innerHTML;
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enviando...';
-
-      const enviado = await enviarFacturaPorCorreo(reserva);
-
-      if (enviado) {
-        showToast(`Factura enviada a ${reserva.userEmail} ✉️`, "success", 4000);
-        cerrar();
-      } else {
-        showToast(
-          "No se pudo enviar la factura. Revisa la configuración de EmailJS.",
-          "error",
-          5000,
-        );
-        btn.disabled = false;
-        btn.innerHTML = textoOriginal;
-      }
-    });
 }

@@ -8,41 +8,41 @@
    =================================================== */
 
 import {
-    db,
-    collection,
-    doc,
-    addDoc,
-    getDoc,
-    getDocs,
-    updateDoc,
-    deleteDoc,
-    query,
-    where,
-    orderBy,
-    serverTimestamp,
-    USE_DEMO_MODE,
-    COLLECTIONS
+  db,
+  collection,
+  doc,
+  addDoc,
+  getDoc,
+  getDocs,
+  updateDoc,
+  deleteDoc,
+  query,
+  where,
+  orderBy,
+  serverTimestamp,
+  USE_DEMO_MODE,
+  COLLECTIONS,
 } from "./firebase-config.js";
 import {
-    AREAS,
-    generarMesas,
-    HORAS_COMIDA,
-    HORAS_CENA,
-    HORARIOS,
-    MENUS,
-    DEMO_RESERVACIONES,
-    MESES,
-    DIAS_CORTOS,
-    getEstadoMesas,
-    refreshEstadoMesas,
+  AREAS,
+  generarMesas,
+  HORAS_COMIDA,
+  HORAS_CENA,
+  HORARIOS,
+  MENUS,
+  DEMO_RESERVACIONES,
+  MESES,
+  DIAS_CORTOS,
+  getEstadoMesas,
+  refreshEstadoMesas,
 } from "./data.js";
 import { getCurrentUser, protectPage } from "./auth.js";
 import {
-    showToast,
-    formatCurrency,
-    formatDate,
-    getTodayISO,
-    traducirEstado,
+  showToast,
+  formatCurrency,
+  formatDate,
+  getTodayISO,
+  traducirEstado,
 } from "./main.js";
 
 // ==========================================================
@@ -73,7 +73,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // En prod: cargar estado de mesas desde Firestore antes del render
   if (!USE_DEMO_MODE) {
-    try { await refreshEstadoMesas(); } catch (e) { /* fallback */ }
+    try {
+      await refreshEstadoMesas();
+    } catch (e) {
+      /* fallback */
+    }
   }
 
   await cargarReservaciones();
@@ -629,26 +633,92 @@ function renderMenusTiemposReserva() {
     clasico: "fa-utensils",
     formal: "fa-wine-glass",
     gala: "fa-crown",
+    alacarta: "fa-list-ul",
   };
 
   container.innerHTML = Object.values(MENUS)
-    .map(
-      (menu) => `
+    .map((menu) => {
+      const esAlaCarta = menu.id === "alacarta";
+      return `
         <div class="tiempo-card-compact ${state.menuElegido === menu.id ? "selected" : ""}"
              data-menu-id="${menu.id}">
-            <div class="tc-icon">
-                <i class="fa-solid ${iconos[menu.id]}"></i>
-            </div>
+            <div class="tc-icon"><i class="fa-solid ${iconos[menu.id] || "fa-utensils"}"></i></div>
             <h4>${menu.nombre}</h4>
             <div class="tc-subtitle">${menu.subtitle}</div>
             <div class="tc-price">
-                ${formatCurrency(menu.precio)}
-                <small>/ persona</small>
+                ${
+                  esAlaCarta
+                    ? '<span style="font-size:0.95rem;">Precio variable</span>'
+                    : `${formatCurrency(menu.precio)}<small>/ persona</small>`
+                }
             </div>
-        </div>
-    `,
-    )
+            <button type="button"
+                    class="btn-menu-info"
+                    data-menu-info="${menu.id}">
+                <i class="fa-solid fa-circle-info" style="font-size:0.68rem;"></i> Más información
+            </button>
+        </div>`;
+    })
     .join("");
+
+  // Inyectar modal de info si no existe
+  if (!document.getElementById("menu-info-modal")) {
+    const modal = document.createElement("div");
+    modal.id = "menu-info-modal";
+    modal.className = "menu-info-modal";
+    modal.innerHTML = `<div class="menu-info-modal__card">
+      <button class="menu-info-modal__close" id="menu-info-modal-close">&times;</button>
+      <div id="menu-info-modal-body"></div>
+    </div>`;
+    document.body.appendChild(modal);
+    document
+      .getElementById("menu-info-modal-close")
+      .addEventListener("click", cerrarMenuInfoModal);
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) cerrarMenuInfoModal();
+    });
+  }
+}
+
+function abrirMenuInfoModal(menuId) {
+  const menu = MENUS[menuId];
+  if (!menu) return;
+  const modal = document.getElementById("menu-info-modal");
+  const body = document.getElementById("menu-info-modal-body");
+  if (!modal || !body) return;
+  const iconos = {
+    clasico: "fa-utensils",
+    formal: "fa-wine-glass",
+    gala: "fa-crown",
+    alacarta: "fa-list-ul",
+  };
+  const esAlaCarta = menuId === "alacarta";
+  body.innerHTML = `
+    <div class="menu-info-modal__icon"><i class="fa-solid ${iconos[menuId] || "fa-utensils"}"></i></div>
+    <h3 style="margin:0 0 4px;font-family:var(--font-heading);color:var(--color-dark);">${menu.nombre}</h3>
+    <p style="font-size:0.82rem;color:var(--color-text-light);margin:0 0 8px;">${menu.subtitle}</p>
+    <p style="font-size:0.88rem;color:var(--color-text-light);margin-bottom:12px;">${menu.descripcion}</p>
+    <div class="menu-info-modal__price">
+      ${
+        esAlaCarta
+          ? '<span style="font-size:1rem;color:var(--color-primary);">Precio según tu selección</span>'
+          : `${formatCurrency(menu.precio)}<small style="font-size:0.7rem;font-weight:400;color:var(--color-text-light);"> / persona</small>`
+      }
+    </div>
+    <ul>${(menu.caracteristicas || []).map((c) => `<li>${c}</li>`).join("")}</ul>
+    <div style="margin-top:14px;padding:10px;background:var(--color-cream);border-radius:var(--radius-sm);font-size:0.8rem;color:var(--color-text-light);">
+      <i class="fa-solid fa-circle-info"></i>
+      ${
+        esAlaCarta
+          ? "Con <strong>A la Carta</strong> el total se calculará en base a los platillos que ordenes el día de tu visita."
+          : "Una vez confirmada tu reserva podrás personalizar los platillos de cada tiempo desde la sección <strong>Menú</strong>."
+      }
+    </div>`;
+  modal.classList.add("active");
+}
+
+function cerrarMenuInfoModal() {
+  document.getElementById("menu-info-modal")?.classList.remove("active");
 }
 
 // ==========================================================
@@ -763,6 +833,14 @@ function initEventListeners() {
   }
 
   document.addEventListener("click", (e) => {
+    // Botón "Más información" — abre modal SIN seleccionar la card
+    const infoBtn = e.target.closest(".btn-menu-info");
+    if (infoBtn) {
+      e.stopPropagation();
+      abrirMenuInfoModal(infoBtn.dataset.menuInfo);
+      return;
+    }
+
     const tiempoCard = e.target.closest(".tiempo-card-compact");
     if (tiempoCard) {
       state.menuElegido = tiempoCard.dataset.menuId;
@@ -817,7 +895,8 @@ function actualizarResumen() {
 
   const menu = state.menuElegido ? MENUS[state.menuElegido] : null;
   const area = AREAS.find((a) => a.id === state.area);
-  const total = menu ? menu.precio * state.personas : 0;
+  const esAlaCarta = menu?.id === "alacarta";
+  const total = esAlaCarta ? 0 : menu ? menu.precio * state.personas : 0;
 
   resumen.innerHTML = `
         <h4><i class="fa-solid fa-receipt"></i> Resumen de tu reservación</h4>
@@ -847,7 +926,7 @@ function actualizarResumen() {
         </div>
         <div class="summary-row">
             <span class="summary-label">Total estimado</span>
-            <span class="summary-value">${formatCurrency(total)}</span>
+            <span class="summary-value">${esAlaCarta ? "Según consumo" : formatCurrency(total)}</span>
         </div>
     `;
 }
@@ -898,7 +977,8 @@ async function confirmarReservacion() {
 
   const user = getCurrentUser();
   const menu = MENUS[state.menuElegido];
-  const total = menu.precio * state.personas;
+  const esAlaCarta = menu.id === "alacarta";
+  const total = esAlaCarta ? 0 : menu.precio * state.personas;
 
   const nuevaReserva = {
     userId: user.uid,
@@ -1007,7 +1087,10 @@ export async function getTodasLasReservaciones() {
     return [...DEMO_RESERVACIONES, ...localReservas];
   }
   try {
-    const q = query(collection(db, COLLECTIONS.RESERVATIONS), orderBy("fecha", "desc"));
+    const q = query(
+      collection(db, COLLECTIONS.RESERVATIONS),
+      orderBy("fecha", "desc"),
+    );
     const snapshot = await getDocs(q);
     return snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
   } catch (error) {
@@ -1016,19 +1099,25 @@ export async function getTodasLasReservaciones() {
   }
 }
 
-export async function actualizarEstadoReserva(reservaId, nuevoEstado) {
+export async function actualizarEstadoReserva(
+  reservaId,
+  nuevoEstado,
+  camposExtra = {},
+) {
   if (USE_DEMO_MODE) {
     const stored = localStorage.getItem(STORAGE_KEY);
     const reservas = stored ? JSON.parse(stored) : [];
     const idx = reservas.findIndex((r) => r.id === reservaId);
     if (idx > -1) {
       reservas[idx].estado = nuevoEstado;
+      Object.assign(reservas[idx], camposExtra);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(reservas));
       return true;
     }
     const demoIdx = DEMO_RESERVACIONES.findIndex((r) => r.id === reservaId);
     if (demoIdx > -1) {
       DEMO_RESERVACIONES[demoIdx].estado = nuevoEstado;
+      Object.assign(DEMO_RESERVACIONES[demoIdx], camposExtra);
       return true;
     }
     return false;
@@ -1037,6 +1126,7 @@ export async function actualizarEstadoReserva(reservaId, nuevoEstado) {
     await updateDoc(doc(db, COLLECTIONS.RESERVATIONS, reservaId), {
       estado: nuevoEstado,
       updatedAt: serverTimestamp(),
+      ...camposExtra,
     });
     return true;
   } catch (error) {

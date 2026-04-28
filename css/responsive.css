@@ -150,8 +150,14 @@
     gap: 20px;
   }
   .menu-tiempos-compact {
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .area-selector {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .features {
+    grid-template-columns: repeat(2, 1fr);
   }
 
   /* Stats admin 2 cols */
@@ -338,10 +344,10 @@
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   }
 
-  /* Tiempos compact */
+  /* Tiempos compact — 2 en fila en phablet */
   .menu-tiempos-compact {
-    grid-template-columns: 1fr;
-    gap: 12px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
   }
 
   /* Auth */
@@ -505,7 +511,7 @@
   }
 
   .area-selector {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
@@ -606,12 +612,12 @@
     gap: 25px;
   }
 
-  /* Features */
+  /* Features — 2 en fila incluso en móvil estándar */
   .features {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
   .feature-card {
-    padding: 25px 18px;
+    padding: 18px 12px;
   }
 
   /* Dishes */
@@ -637,8 +643,8 @@
     padding: 20px 15px;
   }
   .menu-items {
-    grid-template-columns: 1fr;
-    gap: 12px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
   }
   .menu-item {
     padding: 12px;
@@ -653,9 +659,9 @@
     padding: 8px 14px;
   }
 
-  /* Area selector */
+  /* Area selector — 2 en fila */
   .area-selector {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
   .area-option {
     padding: 15px 10px;
@@ -687,9 +693,9 @@
     font-size: 0.8rem;
   }
 
-  /* Admin stats */
+  /* Admin stats — 2 en fila incluso en móvil (nunca 3+1) */
   .stats-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
   .stat-card {
     padding: 20px 18px;
@@ -930,6 +936,16 @@
   }
   .banner-small .banner-title {
     font-size: 1.5rem;
+  }
+  /* En pantallas muy pequeñas sí permitimos 1 columna */
+  .features,
+  .area-selector,
+  .menu-tiempos-compact {
+    grid-template-columns: 1fr;
+  }
+  .menu-paper .menu-items,
+  .menu-items--compact {
+    grid-template-columns: 1fr;
   }
 }
 

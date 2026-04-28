@@ -831,6 +831,25 @@ export const MENUS = {
       "Degustación de sambal",
     ],
   },
+  alacarta: {
+    id: "alacarta",
+    nombre: "A la Carta",
+    subtitle: "Selección libre",
+    tiempos: 0,
+    precio: 0, // precio dinámico — suma de platillos elegidos
+    descripcion: "Elige libremente cualquier platillo de nuestra carta al precio individual de cada uno",
+    // Sin límite por categoría (valor alto = ilimitado en la práctica)
+    estructura: ["entradas", "principales", "postres", "bebidas"],
+    maxSelecciones: { entradas: 20, principales: 20, postres: 20, bebidas: 20 },
+    caracteristicas: [
+      "Selección libre de toda la carta",
+      "Precio individual por platillo",
+      "Sin mínimo de tiempos",
+      "Puedes pedir repetir tus favoritos",
+      "Bebidas, postres y entradas opcionales",
+      "Total según tu consumo real",
+    ],
+  },
 };
 
 // ==========================================================

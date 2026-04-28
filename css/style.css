@@ -6,17 +6,17 @@
 /* ---------- VARIABLES CSS (Paleta Indonesia) ---------- */
 :root {
   /* ── Aliases del tema indonesio (compatibilidad componentes) ── */
-  --brand-bg:        linear-gradient(135deg, #1a1110 0%, #3e2723 100%);
-  --brand-accent:    #d4af37;   /* → dorado templo          */
+  --brand-bg: linear-gradient(135deg, #1a1110 0%, #3e2723 100%);
+  --brand-accent: #d4af37; /* → dorado templo          */
   --brand-accent-dark: #8b0000; /* → rojo profundo          */
-  --panel-bg:        #faf3e7;   /* → crema arroz            */
-  --text-primary:    #2c2421;   /* → color-text             */
-  --text-secondary:  #6b5d54;   /* → color-text-light       */
-  --text-muted:      #a08060;   /* marrón especia atenuado  */
-  --border:          #e8dcc4;   /* → color-border (cálido)  */
-  --input-bg:        #faf3e7;   /* → crema arroz            */
-  --font-serif:      "Playfair Display", Georgia, serif;
-  --font-sans:       "Poppins", system-ui, sans-serif;
+  --panel-bg: #faf3e7; /* → crema arroz            */
+  --text-primary: #2c2421; /* → color-text             */
+  --text-secondary: #6b5d54; /* → color-text-light       */
+  --text-muted: #a08060; /* marrón especia atenuado  */
+  --border: #e8dcc4; /* → color-border (cálido)  */
+  --input-bg: #faf3e7; /* → crema arroz            */
+  --font-serif: "Playfair Display", Georgia, serif;
+  --font-sans: "Poppins", system-ui, sans-serif;
   /* Colores principales inspirados en Indonesia */
   --color-primary: #c1272d; /* Rojo batik / bandera */
   --color-primary-dark: #8b0000; /* Rojo profundo */
@@ -509,6 +509,17 @@ button {
   grid-template-columns: 1fr;
 }
 
+/* Admin page: paneles más anchos */
+.main-layout.admin-wide {
+  width: 97%;
+  max-width: 1700px;
+  padding: 40px 12px;
+}
+
+.main-layout.admin-wide .admin-panel {
+  padding: 30px 36px;
+}
+
 .main-section {
   min-width: 0;
 }
@@ -963,14 +974,15 @@ button {
    =================================================== */
 .features {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 30px;
-  margin-top: 30px;
+  /* 4 en fila → 2 en fila → 1 en fila. Nunca 3+1 */
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-top: 24px;
 }
 
 .feature-card {
   background: var(--color-light);
-  padding: 35px 25px;
+  padding: 22px 16px;
   border-radius: var(--radius-md);
   text-align: center;
   box-shadow: var(--shadow-sm);
@@ -1007,8 +1019,8 @@ button {
 }
 
 .feature-icon {
-  width: 80px;
-  height: 80px;
+  width: 56px;
+  height: 56px;
   background: linear-gradient(
     135deg,
     var(--color-primary),
@@ -1018,21 +1030,22 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 20px;
+  margin: 0 auto 14px;
   color: var(--color-light);
-  font-size: 2rem;
+  font-size: 1.4rem;
   box-shadow: var(--shadow-md);
 }
 
 .feature-card h3 {
-  margin-bottom: 12px;
+  margin-bottom: 8px;
   color: var(--color-dark);
-  font-size: 1.25rem;
+  font-size: 1rem;
 }
 
 .feature-card p {
   color: var(--color-text-light);
-  font-size: 0.95rem;
+  font-size: 0.82rem;
+  line-height: 1.45;
 }
 
 /* ---------- Platillos destacados ---------- */
@@ -1344,8 +1357,9 @@ button {
    =================================================== */
 .area-selector {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 15px;
+  /* 4 en fila → 2 en fila → 1 en fila. Nunca 3+1 */
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
   margin-bottom: 20px;
 }
 
@@ -1586,7 +1600,8 @@ button {
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  /* 4 en fila → 2 en fila → 1 en fila. Nunca 3+1 */
+  grid-template-columns: repeat(4, 1fr);
   gap: 20px;
   margin-bottom: 30px;
 }
@@ -1697,6 +1712,11 @@ button {
 .status-badge.cancelled {
   background: #ffebee;
   color: #c62828;
+}
+
+.status-badge.pasada {
+  background: #ede7f6;
+  color: #512da8;
 }
 
 .status-badge.admin {
@@ -2654,6 +2674,7 @@ button {
 #admin-panel-container {
   overflow-x: hidden;
   max-width: 100%;
+  width: 100%;
 }
 
 .data-table {
@@ -2986,8 +3007,9 @@ button {
    =================================================== */
 .menu-tiempos-compact {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  /* 4 en fila → 2 en fila → 1 en fila. Nunca 3+1 */
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
   margin-top: 15px;
 }
 
@@ -2995,11 +3017,14 @@ button {
   background: var(--color-light);
   border: 2px solid var(--color-border);
   border-radius: var(--radius-md);
-  padding: 22px 18px;
+  padding: 18px 14px;
   text-align: center;
   cursor: pointer;
   transition: var(--transition);
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .tiempo-card-compact:hover {
@@ -3017,10 +3042,10 @@ button {
 .tiempo-card-compact.selected::after {
   content: "✓";
   position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 26px;
-  height: 26px;
+  top: 8px;
+  right: 8px;
+  width: 22px;
+  height: 22px;
   background: var(--color-primary);
   color: var(--color-light);
   border-radius: 50%;
@@ -3028,49 +3053,149 @@ button {
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
 }
 
 .tiempo-card-compact .tc-icon {
-  font-size: 1.9rem;
+  font-size: 1.6rem;
   color: var(--color-primary);
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .tiempo-card-compact h4 {
   font-family: var(--font-heading);
-  font-size: 1.15rem;
+  font-size: 1rem;
   color: var(--color-dark);
-  margin: 0 0 4px;
+  margin: 0 0 3px;
 }
 
 .tiempo-card-compact .tc-subtitle {
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   color: var(--color-text-light);
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .tiempo-card-compact .tc-price {
   font-family: var(--font-heading);
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   color: var(--color-primary);
   font-weight: 700;
   margin-bottom: 3px;
 }
 
 .tiempo-card-compact .tc-price small {
-  font-size: 0.65rem;
+  font-size: 0.62rem;
   color: var(--color-text-light);
   font-weight: 400;
 }
 
+/* Botón "Más información" dentro de cada tiempo-card-compact */
+.btn-menu-info {
+  margin-top: 8px;
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  color: var(--color-text-light);
+  font-size: 0.7rem;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: var(--font-body);
+  width: 100%;
+}
+
+.btn-menu-info:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: #fff8ed;
+}
+
+/* Modal de información de menú */
+.menu-info-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.menu-info-modal.active {
+  display: flex;
+}
+
+.menu-info-modal__card {
+  background: var(--color-light);
+  border-radius: var(--radius-md);
+  padding: 32px 28px;
+  max-width: 480px;
+  width: 100%;
+  box-shadow: var(--shadow-xl, 0 20px 60px rgba(0, 0, 0, 0.25));
+  position: relative;
+  animation: slideUp 0.2s ease;
+}
+
+.menu-info-modal__close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.3rem;
+  color: var(--color-text-light);
+  line-height: 1;
+}
+
+.menu-info-modal__icon {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  color: var(--color-primary);
+}
+
+.menu-info-modal__price {
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  color: var(--color-primary);
+  font-weight: 700;
+  margin: 6px 0 2px;
+}
+
+.menu-info-modal ul {
+  list-style: none;
+  padding: 0;
+  margin: 14px 0 0;
+}
+
+.menu-info-modal ul li {
+  padding: 7px 0;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 0.9rem;
+  color: var(--color-dark);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.menu-info-modal ul li:last-child {
+  border-bottom: none;
+}
+
+.menu-info-modal ul li::before {
+  content: "✓";
+  color: var(--color-accent, #2c5f2d);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
 @media (max-width: 700px) {
   .menu-tiempos-compact {
-    grid-template-columns: 1fr;
-    gap: 12px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
   }
   .tiempo-card-compact {
-    padding: 18px 14px;
+    padding: 14px 10px;
   }
 }
 
@@ -3194,11 +3319,208 @@ button {
 
 .menu-paper .menu-items {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  /* En vista normal: 2 columnas mínimo en móvil */
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 14px;
 }
 
-/* Info de la reserva activa en menu.html */
+/* ── MODO COMPACTO: cuando el menú está activo en móvil/tablet ──
+   Las cards se minimizan para ver más en pantalla y tienen
+   controles +/- prominentes. Se activa añadiendo .menu-items--compact
+   al wrapper cuando state.reservaActiva existe. */
+.menu-items--compact {
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.menu-items--compact .menu-item {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Imagen pequeña en modo compacto */
+.menu-items--compact .menu-item-image,
+.menu-items--compact .menu-item-image--placeholder {
+  height: 90px !important;
+  border-radius: var(--radius-sm) !important;
+}
+
+.menu-items--compact .menu-item-image .menu-item-emoji,
+.menu-items--compact .menu-item-image--placeholder .menu-item-emoji {
+  font-size: 2.2rem !important;
+}
+
+/* Ocultar descripción y origen en modo compacto */
+.menu-items--compact .menu-item-desc,
+.menu-items--compact .menu-item-origin,
+.menu-items--compact .tag-list,
+.menu-items--compact .spicy-level {
+  display: none;
+}
+
+.menu-items--compact .menu-item-name {
+  font-size: 0.82rem;
+  line-height: 1.2;
+}
+
+.menu-items--compact .menu-item-price {
+  font-size: 0.88rem;
+}
+
+/* ── Controles de cantidad (+/−/badge) ── */
+.qty-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.qty-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--color-primary);
+  background: transparent;
+  color: var(--color-primary);
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+  line-height: 1;
+  padding: 0;
+}
+
+.qty-btn:hover {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.qty-badge {
+  min-width: 26px;
+  height: 26px;
+  background: var(--color-primary);
+  color: #fff;
+  border-radius: 50%;
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* En modo compacto los controles ocupan todo el ancho */
+.menu-items--compact .qty-controls {
+  width: 100%;
+}
+
+.menu-items--compact .qty-btn {
+  width: 32px;
+  height: 32px;
+  font-size: 1.2rem;
+}
+
+/* ── Sticky Selection Tray ──
+   Barra flotante en la parte inferior (solo cuando menú activo).
+   Muestra progreso por categoría y permite navegar a ella. */
+.selection-tray {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--color-dark);
+  color: #fff;
+  z-index: 900;
+  padding: 10px 16px;
+  display: none; /* JS lo activa con .active */
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.35);
+  scrollbar-width: none;
+}
+.selection-tray::-webkit-scrollbar {
+  display: none;
+}
+.selection-tray.active {
+  display: flex;
+}
+
+.tray-cat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 66px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  transition: background 0.15s;
+  flex-shrink: 0;
+  text-decoration: none;
+}
+.tray-cat:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.tray-cat-label {
+  font-size: 0.64rem;
+  opacity: 0.7;
+  white-space: nowrap;
+}
+
+.tray-cat-count {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--color-secondary);
+}
+
+.tray-cat-count.done {
+  color: #6fcf97;
+}
+
+.tray-separator {
+  width: 1px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.15);
+  flex-shrink: 0;
+}
+
+.tray-cliente {
+  font-size: 0.7rem;
+  opacity: 0.6;
+  white-space: nowrap;
+  margin-right: auto;
+  flex-shrink: 0;
+}
+
+/* Padding-bottom al contenido para que la tray no tape lo último */
+body.tray-active main,
+body.tray-active .content-area {
+  padding-bottom: 64px;
+}
+
+/* ── Responsive menu-items ── */
+@media (max-width: 756px) {
+  .menu-paper {
+    padding: 30px 20px;
+  }
+  .menu-paper-header h2 {
+    font-size: 1.6rem;
+  }
+  /* En móvil la carta normal ya muestra 2 columnas */
+  .menu-paper .menu-items {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  /* Y en modo compacto también 2 (ya definido arriba) */
+}
 .active-reservation-info {
   background: linear-gradient(
     135deg,
@@ -3252,9 +3574,9 @@ button {
   .menu-paper-header h2 {
     font-size: 1.6rem;
   }
-  .menu-paper .menu-items {
+  /* .menu-paper .menu-items {
     grid-template-columns: 1fr;
-  }
+  } */
 }
 
 /* ===================================================
@@ -3282,7 +3604,11 @@ button {
 }
 
 .btn-habilitar-menu.active {
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    var(--color-primary-dark) 100%
+  );
 }
 
 .btn-habilitar-menu:disabled {
@@ -5317,7 +5643,10 @@ body.modal-open {
   font-weight: 500;
   color: var(--color-text);
   cursor: pointer;
-  transition: border-color 0.2s, background 0.2s, transform 0.1s;
+  transition:
+    border-color 0.2s,
+    background 0.2s,
+    transform 0.1s;
 }
 
 .social-btn:hover {
@@ -5353,4 +5682,153 @@ body.modal-open {
 .social-btn.facebook:hover {
   background: #1565d8;
   border-color: #1565d8;
+}
+
+/* ===================================================
+   MODAL GENÉRICO DE CONFIRMACIÓN
+   =================================================== */
+.generic-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.generic-modal.active {
+  display: flex;
+}
+.generic-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+}
+.generic-modal__card {
+  position: relative;
+  background: var(--color-light);
+  border-radius: var(--radius-md);
+  padding: 32px 28px 24px;
+  max-width: 420px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+  animation: slideUp 0.2s ease;
+}
+.generic-modal__title {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  color: var(--color-dark);
+  margin: 0 0 10px;
+}
+.generic-modal__msg {
+  font-size: 0.95rem;
+  color: var(--color-text-light);
+  margin: 0 0 24px;
+  line-height: 1.5;
+}
+.generic-modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+/* Botón danger (destructivo) */
+.btn-danger {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+}
+.btn-danger:hover {
+  background: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+}
+
+/* ===================================================
+   PEDIDOS — COLAPSABLES
+   =================================================== */
+/* Botón toggle en el header del pedido */
+.pedido-collapse-btn {
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  color: var(--color-text-light);
+  cursor: pointer;
+  font-size: 0.78rem;
+  padding: 4px 12px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: var(--transition);
+  white-space: nowrap;
+  font-family: var(--font-body);
+}
+.pedido-collapse-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+.pedido-collapse-btn .chevron {
+  transition: transform 0.25s ease;
+}
+.pedido-reserva-card.collapsed .pedido-collapse-btn .chevron {
+  transform: rotate(-90deg);
+}
+
+/* Cuerpo oculto cuando está colapsado */
+.pedido-reserva-card.collapsed .pedido-reserva-body {
+  display: none;
+}
+
+/* Resumen de precios (visible solo cuando está colapsado) */
+.pedido-precio-resumen {
+  display: none;
+  padding: 10px 20px;
+  background: var(--color-cream);
+  border-top: 1px solid var(--color-border);
+  font-size: 0.84rem;
+  color: var(--color-text-light);
+  gap: 18px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.pedido-reserva-card.collapsed .pedido-precio-resumen {
+  display: flex;
+}
+.pedido-precio-item {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+.pedido-precio-item strong {
+  color: var(--color-dark);
+  font-size: 0.9rem;
+}
+.pedido-precio-total {
+  margin-left: auto;
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+/* Actions siempre visibles (dentro del body, pero lo movemos afuera) */
+.pedido-reserva-card.collapsed .pedido-reserva-actions {
+  display: flex;
+}
+
+/* stats-grid responsivo */
+@media (max-width: 900px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 480px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 360px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
 }

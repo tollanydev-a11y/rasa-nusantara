@@ -89,16 +89,18 @@ function initLogout() {
 
   logoutBtn.addEventListener("click", async (e) => {
     e.preventDefault();
-
-    if (confirm("¿Deseas cerrar sesión?")) {
-      const result = await logoutUser();
-      if (result.success) {
-        showToast("Sesión cerrada correctamente", "success");
-        setTimeout(() => {
-          window.location.href = "index.html";
-        }, 800);
-      }
-    }
+    showConfirmModal(
+      "Cerrar sesión",
+      "¿Deseas cerrar sesión?",
+      async () => {
+        const result = await logoutUser();
+        if (result.success) {
+          showToast("Sesión cerrada correctamente", "success");
+          setTimeout(() => { window.location.href = "index.html"; }, 800);
+        }
+      },
+      { confirmText: "Cerrar sesión", cancelText: "Cancelar" }
+    );
   });
 }
 
@@ -215,6 +217,7 @@ export function traducirEstado(estado) {
       confirmed: "Confirmada",
       pending: "Pendiente",
       cancelled: "Cancelada",
+      pasada: "Completada",
     }[estado] || estado
   );
 }
@@ -285,3 +288,54 @@ export function renderPlatilloImage(
         </div>
     `;
 }
+
+// ==========================================================
+// MODAL GENÉRICO DE CONFIRMACIÓN
+// Reemplaza confirm() nativo en toda la aplicación.
+// Uso:
+//   showConfirmModal('Título', 'Mensaje', () => acción(), opts?)
+//   opts: { confirmText, cancelText, danger }
+// ==========================================================
+export function showConfirmModal(title, message, onConfirm, opts = {}) {
+  const {
+    confirmText = "Aceptar",
+    cancelText  = "Cancelar",
+    danger      = false,
+  } = opts;
+
+  // Eliminar instancia previa
+  document.getElementById("generic-modal")?.remove();
+
+  const modal = document.createElement("div");
+  modal.id = "generic-modal";
+  modal.className = "generic-modal";
+  modal.innerHTML = `
+    <div class="generic-modal__backdrop"></div>
+    <div class="generic-modal__card" role="dialog" aria-modal="true">
+      <h3 class="generic-modal__title">${title}</h3>
+      <p class="generic-modal__msg">${message}</p>
+      <div class="generic-modal__actions">
+        <button class="btn btn-outline" id="gm-cancel">${cancelText}</button>
+        <button class="btn ${danger ? "btn-danger" : "btn-primary"}" id="gm-confirm">${confirmText}</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+
+  // Forzar reflow para que la animación arranque
+  requestAnimationFrame(() => modal.classList.add("active"));
+
+  const close = () => {
+    modal.classList.remove("active");
+    setTimeout(() => modal.remove(), 200);
+  };
+
+  modal.querySelector("#gm-cancel").addEventListener("click", close);
+  modal.querySelector(".generic-modal__backdrop").addEventListener("click", close);
+  modal.querySelector("#gm-confirm").addEventListener("click", () => {
+    close();
+    onConfirm();
+  });
+}
+
+// Exponer globalmente para módulos que no pueden importar fácilmente
+window.showConfirmModal = showConfirmModal;
